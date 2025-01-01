@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>Some Mysteries of Multi-Threading | My Musings</title>
+<meta name="keywords" content="">
+<meta name="description" content="If you have been programming professionally for some time, you probably would have used threads. When used correctly, threads can provide significant speed up in the program.
+I had also written multithreaded programs many times at Sumo Logic. However, recently I felt that since threading is such an important topic, I should probably dive a little deeper into how things work there.
+I started off by reading Java Concurrency in Practice and although I have gone through only a couple of chapters right now, but still I have discovered some interesting things which I was not aware of before.">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/blog/multi-thread/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.d72444526d7ecbdb0015438a7fa89054a658bf759d0542e2e5df81ce94b493ee.css" integrity="sha256-1yREUm1&#43;y9sAFUOKf6iQVKZYv3WdBULi5d&#43;BzpS0k&#43;4=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/blog/multi-thread/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="My Musings (Alt + H)">My Musings</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      Some Mysteries of Multi-Threading
+    </h1>
+    <div class="post-meta"><span title='2021-04-02 12:09:25 +0530 IST'>April 2, 2021</span>&nbsp;·&nbsp;7 min
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#the-visibility-issue" aria-label="The Visibility Issue">The Visibility Issue</a></li>
+                <li>
+                    <a href="#this-escape-during-construction" aria-label="This Escape during Construction">This Escape during Construction</a></li>
+                <li>
+                    <a href="#conclusion" aria-label="Conclusion">Conclusion</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>If you have been programming professionally for some time, you probably would have used threads. When used correctly, threads can provide significant speed up in the program.</p>
+<p>I had also written multithreaded programs many times at Sumo Logic. However, recently I felt that since threading is such an important topic, I should probably dive a little deeper into how things work there.</p>
+<p>I started off by reading <a href="https://www.amazon.in/Java-Concurrency-Practice-Brian-Goetz/dp/0321349601">Java Concurrency in Practice</a> and although I have gone through only a couple of chapters right now, but still I have discovered some interesting things which I was not aware of before.</p>
+<p>The thing which makes multi-threading hard is that you may write a multi-threaded program which works correctly almost all the time but it may still be wrong. It may have some race condition which happens very rarely. The problem is that it might happen in production and cause an outage and you will be clueless about the issue since you have never seen it before. The only way to write correct multi-threaded code is to be aware of the issues which can arise in them theoretically and try to avoid them. If it sounds hard, that is because it is.</p>
+<p>In this post I am going to describe two issues which are very basic but I am sure many of you who are new to multi-threading might not know about them. At least I didn&rsquo;t. These are just scratching the surface. Hopefully as I discover new things I will write other blogs explaining them. But till then, lets begin with these&hellip;</p>
+<h3 id="the-visibility-issue">The Visibility Issue<a hidden class="anchor" aria-hidden="true" href="#the-visibility-issue">#</a></h3>
+<p>Consider the code snippet below:</p>
+<pre tabindex="0"><code>public class Visibility {
+
+    static boolean stop = false;
+
+    static class MyJob implements Runnable {
+        @Override
+        public void run() {
+            System.out.println(Thread.currentThread().getName() + &#34; starting..&#34;);
+            while (!stop);
+            System.out.println(Thread.currentThread().getName() + &#34; stopping..&#34;);
+        }
+    }
+
+    public static void main(String[] args) throws Throwable {
+        MyJob mj = new MyJob();
+        new Thread(mj).start();
+        System.out.println(&#34;My Job launched&#34;);
+        Thread.sleep(1000);
+        stop = true;
+        System.out.println(&#34;stop set to true, main exiting&#34;);
+    }
+}
+</code></pre><p>Lets try to reason what the code should do ideally. So in the main method we first create an instance of the runnable MyJob and then start a new thread passing in that runnable. Next we print &ldquo;My Job launched&rdquo; on the main thread and sleep for a second. Then we set a static variable stop to true from main. Finally we print out that stop has been set to true and we are exiting main.
+In the run method of the MyJob class, there is an infinite while loop checking the value of stop. As soon as stop is set to true, the method should exit printing the stopping line.</p>
+<p>Now don&rsquo;t know about you guys but the first time I saw this program, my expectation was a bunch of launching lines to be printed and then after a second or two, the program should exit printing the stopping line. I was surprised when I actually ran the code. It prints the following:</p>
+<p><strong>My Job launched
+Thread-0 starting..
+stop set to true, main exiting</strong></p>
+<p>and then just hangs. It does not terminate.</p>
+<p>This is kind of unexpected. When I tried finding the reason for this behavior here is what I found.
+The boolean variable stop is being set by the main thread. The change made by the main thread is not visible to Thread-0 (the thread running MyJob) instantly. The reason for this is caching.
+In the while loop which is present in the runnable, we are reading the value of the stop variable. Now the compiler ensures that we don&rsquo;t have to go to the main memory each time to read that value. The variable is read from the cache. And both threads will have different copies of the variable in their cache. If we change the value of the variable in another thread, the current thread will not see the updated value unless we do something different.
+The simplest solution to this problem is to just add one keyword to the stop variable. Make it volatile.</p>
+<p>The Java volatile keyword is intended to address variable visibility problems. By declaring the stop variable volatile all writes to the stop variable will be written back to main memory immediately. Also, all reads of the stop variable will be read directly from main memory. So changing the first line to: static volatile boolean stop = false; will fix the issue.
+There are other ways to fix this as well like using synchronized getters/setters for this variable. But the reasoning of why it works probably needs another post. Volatile keyword is probably the simplest way of solving this.</p>
+<h3 id="this-escape-during-construction">This Escape during Construction<a hidden class="anchor" aria-hidden="true" href="#this-escape-during-construction">#</a></h3>
+<p>Escape of this reference from a class. This is a little complex to understand. The main issue here is that the reference to a class can escape to another class even before it&rsquo;s constructor finishes causing the object to be in an inconsistent state. To demonstrate this issue consider the following code:</p>
+<pre tabindex="0"><code>import java.util.Date;
+import java.util.concurrent.atomic.AtomicReference;
+
+public class ThisEscape {
+
+    private final int num;
+
+    public ThisEscape(EventSource source) {
+        source.registerListener(new EventListener() {
+            public void onEvent(Event e) {
+                doSomething(e);
+            }
+        });
+        num = 42;
+    }
+
+    private void doSomething(Event e) {
+        if (num != 42) System.out.println(&#34;Race condition detected at &#34; + new Date());
+    }
+}
+
+
+class EventSource extends Thread {
+    private final AtomicReference&lt;EventListener&gt; listeners = 
+new AtomicReference&lt;EventListener&gt;();
+
+    public void run() {
+        while (true) {
+            EventListener listener = listeners.getAndSet(null);
+            if (listener != null) listener.onEvent(null);
+        }
+    }
+
+    public void registerListener(EventListener eventListener) {
+        listeners.set(eventListener);
+    }
+}
+
+class EventListener {
+    public void onEvent(Event e) {
+
+    }
+}
+
+class Event {}
+
+class EventTest {
+    public static void main(String[] args) throws Throwable {
+        EventSource es = new EventSource();
+        es.start();
+        while(true) {
+            Thread.sleep(10);
+            new ThisEscape(es);
+        }
+    }
+}
+</code></pre><p>This might seem a bit overwhelming at the first look. Lets try to break it down. So the main class here is the ThisEscape class. If you see the constructor, we are doing two things in there. First we are registering a listener and second we are setting the variable num to 42.
+Now if you look at the onEvent method of the listener, we call the method doSomething in there which is a private method of this class. So if some other thread gets hold of the listener, it now has access to private members of the class. However, the bigger issue is that this reference is escaping even before the object creation is complete.
+When you run the code, you will see the log line Race condition detected at .. multiple times.
+We are basically creating this class in a while loop in the main method. This is because the issue does not replicate every time. However it is pretty frequent and can definitely happen in production.</p>
+<p>So the overall logic of the code is that the doSomething method is escaped to another thread and it calls this method even before the num variable can be set in the constructor thereby showing the escape of the reference of a class which has not yet been initialized.</p>
+<p>How do you prevent this issue? Well it is quite simple actually. We have to take extra care to ensure we don&rsquo;t allow the this reference to escape in the constructor. A common mistake that can let the this reference escape during construction is to start a thread from a constructor. When an object creates a thread from its constructor, it almost always shares its this reference with the new thread, either explicitly (by passing it to the constructor) or implicitly (because the Thread or Runnable is an inner class of the owning object). The new thread might then be able to see the owning object before it is fully constructed. There&rsquo;s nothing wrong with creating a thread in a constructor, but it is best not to start the thread immediately. Instead, expose a start or initialize method that starts the owned thread.</p>
+<h3 id="conclusion">Conclusion<a hidden class="anchor" aria-hidden="true" href="#conclusion">#</a></h3>
+<p>So hopefully this post makes you more aware of things that can go wrong if you are not careful with threads. I am also fairly new to multithreaded programming and hopefully as I read more things I would be able to share more interesting facts about threads with everyone.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="http://localhost:1313/">My Musings</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

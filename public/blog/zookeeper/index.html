@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>Zookeeper Internals | My Musings</title>
+<meta name="keywords" content="">
+<meta name="description" content="I had been wanting to understand the internals of zookeeper for quite some time now. In fact, I had already read the basics a couple of times and even worked with the zkcli in my previous organization. However, as it is said that anything written down is more firmly impressed on the mind, hence I am writing this post. (This also has a reference to one of my favorite magician - Michael Vincent)">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/blog/zookeeper/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.d72444526d7ecbdb0015438a7fa89054a658bf759d0542e2e5df81ce94b493ee.css" integrity="sha256-1yREUm1&#43;y9sAFUOKf6iQVKZYv3WdBULi5d&#43;BzpS0k&#43;4=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/blog/zookeeper/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="My Musings (Alt + H)">My Musings</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      Zookeeper Internals
+    </h1>
+    <div class="post-meta"><span title='2021-07-21 12:09:25 +0530 IST'>July 21, 2021</span>&nbsp;·&nbsp;10 min
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#what-is-zookeeper" aria-label="What is Zookeeper?">What is Zookeeper?</a></li>
+                <li>
+                    <a href="#why-zookeeper" aria-label="Why Zookeeper?">Why Zookeeper?</a></li>
+                <li>
+                    <a href="#objectives-of-zookeeper-service" aria-label="Objectives of Zookeeper service">Objectives of Zookeeper service</a></li>
+                <li>
+                    <a href="#zookeeper-data-model" aria-label="Zookeeper Data Model">Zookeeper Data Model</a></li>
+                <li>
+                    <a href="#zookeeper-server-setup" aria-label="Zookeeper server setup">Zookeeper server setup</a></li>
+                <li>
+                    <a href="#zookeeper-api" aria-label="Zookeeper API">Zookeeper API</a></li>
+                <li>
+                    <a href="#example-use-cases-of-zookeeper" aria-label="Example Use Cases Of Zookeeper">Example Use Cases Of Zookeeper</a><ul>
+                        
+                <li>
+                    <a href="#group-membership" aria-label="Group Membership">Group Membership</a></li>
+                <li>
+                    <a href="#locking" aria-label="Locking">Locking</a></li>
+                <li>
+                    <a href="#locking-advanced" aria-label="Locking (advanced)">Locking (advanced)</a></li>
+                <li>
+                    <a href="#leader-election" aria-label="Leader Election">Leader Election</a></li></ul>
+                </li>
+                <li>
+                    <a href="#conclusion" aria-label="Conclusion">Conclusion</a></li>
+                <li>
+                    <a href="#references" aria-label="References">References</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>I had been wanting to understand the internals of zookeeper for quite some time now. In fact, I had already read the basics a couple of times and even worked with the zkcli in my previous organization. However, as it is said that anything written down is more firmly impressed on the mind, hence I am writing this post. (This also has a reference to one of my favorite magician - <a href="https://www.youtube.com/watch?v=F8KFMUdrikM&amp;t=830s">Michael Vincent</a>)</p>
+<p>I recently presented this topic in my current organization and I thought now would be a good time to write this blog. I can accompany it with the slides I had used there which would hopefully make things more clear. Although, I would like to start off with a disclaimer that I am just a beginner in the study of zookeeper and there are multiple things I don&rsquo;t know/understand about it yet. Still I hope at least some of you would find this blog interesting and maybe learn something new from it. Enough with the chit-chat, lets begin!</p>
+<h3 id="what-is-zookeeper">What is Zookeeper?<a hidden class="anchor" aria-hidden="true" href="#what-is-zookeeper">#</a></h3>
+<p>Zookeeper as the name suggests is literally kind of a keeper at a zoo. Just not a zoo of animals but that of distributed systems (a zoo nonetheless). Now zookeeper is defined as a  fast, highly available, fault tolerant distributed coordination service.
+That seems like a simple enough definition. Although we can extract a couple of interesting things from it. First, it claims to be fast. We will see later why exactly is that and what compromise zk makes in order to be fast. Next, it is highly available and fault tolerant. If you are aware of the CAP theorem, you will realize that zk has compromised on consistency. It is not a strongly consistent system but it is highly available. That in turn means, that there is going to be replication.
+Now understanding how Zk achieves whatever it claims to do without strong consistency is a tough topic and we need to go really deep to actually understand it. We would probably be only scratching the surface in this blog. But again, that still has a lot of value to it.</p>
+<h3 id="why-zookeeper">Why Zookeeper?<a hidden class="anchor" aria-hidden="true" href="#why-zookeeper">#</a></h3>
+<p>There are multiple reasons you would want to use a service like zookeeper. The most obvious answer is that distributed system always need some form of coordination. If you want to make a bunch of computers work in tandem, there has to be a reliable way of coordination between them and zookeeper provides that. Here are some of the use cases of zookeeper:</p>
+<ol>
+<li>Storing Config information</li>
+<li>Group Membership</li>
+<li>Distributed lock</li>
+<li>Leader Election</li>
+</ol>
+<p>We will discuss each of them in detail later in the post.</p>
+<h3 id="objectives-of-zookeeper-service">Objectives of Zookeeper service<a hidden class="anchor" aria-hidden="true" href="#objectives-of-zookeeper-service">#</a></h3>
+<p>Here are some of the objectives that the creators of zookeeper had in mind while coming up with its design:</p>
+<ol>
+<li>Simple, robust with a high performance.</li>
+<li>High availability, high throughput and low latency</li>
+<li>Tuned for read dominant workloads</li>
+<li>Familiar models and interfaces</li>
+<li>Wait free - No usage of locks in the APIs.</li>
+</ol>
+<p>We will see how each of these come into play when discussing the data models and the APIs.</p>
+<h3 id="zookeeper-data-model">Zookeeper Data Model<a hidden class="anchor" aria-hidden="true" href="#zookeeper-data-model">#</a></h3>
+<p>Zookeeper has a hierarchical namespace like a file system. Here is how it looks like:</p>
+<figure>
+    <img loading="lazy" src="/images/zk1.png"/> 
+</figure>
+
+<p>So it is like a tree and each node in the tree is called a zonde.</p>
+<p>The znodes can be of three types:</p>
+<ol>
+<li>Persistent (persist even if the client that created them disconnects from the server)</li>
+<li>Ephemeral (deleted if the client that created them disconnects from the server)</li>
+<li>Sequential (the znodes created as sequential will be assigned monotonically increasing numbers)</li>
+</ol>
+<p>The difference between persistent and ephemeral will become more clear in the next section.</p>
+<p>Now it is important to note that zookeeper keeps this entire tree in-memory and that is where the requests are served from. (This is the first indication of how it achieves low latency). It does back them up on disk at regular intervals but that is just for persistence.</p>
+<p>Since the data is in memory that automatically implies that we cannot store big chunks of data in zk nodes. The good news is that we don&rsquo;t have to because that is not the zk use case. So the types of data stored in znodes are like: configuration, counters, location information etc. So mainly metadata.</p>
+<h3 id="zookeeper-server-setup">Zookeeper server setup<a hidden class="anchor" aria-hidden="true" href="#zookeeper-server-setup">#</a></h3>
+<figure>
+    <img loading="lazy" src="/images/zk2.png"/> 
+</figure>
+
+<p>As the figure shows, the zk ensemble should have multiple servers for fault tolerance. There can be multiple clients and they can be connected to any of the servers. Now there would be a leader among the multiple servers. Writes would be processed only by the leader. However the reads can be served by any of the servers.</p>
+<p>If a server is connected to a follower and does a write, the write would be first sent to the leader by the follower and then processed by the leader.</p>
+<h3 id="zookeeper-api">Zookeeper API<a hidden class="anchor" aria-hidden="true" href="#zookeeper-api">#</a></h3>
+<ol>
+<li>bool create(path, data, ACL, flags)</li>
+<li>void delete(path, expectedVersion)</li>
+<li>Stat setData(path, data, expectedVersion)</li>
+<li>(data, Stat) getData(path, watch)</li>
+<li>Stat exists(path, watch)</li>
+<li>String[] getChildren(path, watch)</li>
+</ol>
+<p>The APIs as you will notice are very similar to a filesystem API. Here are a few interesting concepts:
+Flags - The last parameter in the create API allows you to set what kind of znode you want to create (persistent, ephemeral or sequential - can be a combination of persistent/ephemeral and sequential as well)
+Watch - In the getData and exists APIs there is a watch parameter which basically sets a callback on the znode. So whenever the value of the znode is modified (or deleted) the client who set the watch will get notified of the change.</p>
+<p>Now lets take a look at how using these simple APIs, zk solves very generic problems in distributed systems which makes it so popular.</p>
+<h3 id="example-use-cases-of-zookeeper">Example Use Cases Of Zookeeper<a hidden class="anchor" aria-hidden="true" href="#example-use-cases-of-zookeeper">#</a></h3>
+<figure>
+    <img loading="lazy" src="/images/zk3.png"/> 
+</figure>
+
+<h4 id="group-membership">Group Membership<a hidden class="anchor" aria-hidden="true" href="#group-membership">#</a></h4>
+<p>In distributed system, you very often need to group your servers in specific groups. Say you have a microservice architecture and you want to associate a new machine that comes up with a specific microservice. This is basically the problem of service registry. This can be achieved very simply with zk. All you need to do is the following:</p>
+<ol>
+<li>Create a persistent group znode.</li>
+<li>Add ephemeral sequential znodes within it, one for each server.</li>
+</ol>
+<p>The benefit of making them ephemeral is that if the client connection breaks (say the machine goes down), the entry for that client will automatically be deleted from within the group znode.</p>
+<figure>
+    <img loading="lazy" src="/images/zk4.png"/> 
+</figure>
+
+<h4 id="locking">Locking<a hidden class="anchor" aria-hidden="true" href="#locking">#</a></h4>
+<p>Another common requirement in distributed systems is to acquire locks across machines (distributed lock). Zk also provides a simple way to achieve this. Consider this code snippet:</p>
+<figure>
+    <img loading="lazy" src="/images/zk5.png"/> 
+</figure>
+
+<p>In this, we have a persistent znode - lock. Within it we are dealing with just one ephemeral znode - ready-file (can be named anything). Now each client is executing the above 4 lines of code.</p>
+<p>They all try to create the ready-file. This operation will succeed only if the file does not already exist. If the operation succeeds, the client can rest assured that it now has the lock and that no one can acquire it till it release the lock. (they will all be stuck on step 1)</p>
+<p>Otherwise if the file already exists it implies someone else has the lock and we need to wait. Now there are two ways to wait, either we can periodically check the existence of the file or we can use the watch feature provided by zk. So that is what we use in line 2, where we call exist with watch flag set to true.
+Now as soon as the file gets deleted (the client which had the lock, released it), we will get a notification and we can jump to the first step again and try to create the file.</p>
+<p>But there is an issue with this approach. Since we are dealing with just one file and there can be multiple machines which might be trying to acquire a lock, we may have something which is called the herd effect. Now all the machines would have set a watch on the file and as soon as the file is deleted, they will all get notified and they will all try to create the file again. Only one will win (it is a race).
+It is obvious that this method puts unnecessary load on zk servers which can be avoided with a more careful algorithm design. This is what we will discuss in the next section.</p>
+<h4 id="locking-advanced">Locking (advanced)<a hidden class="anchor" aria-hidden="true" href="#locking-advanced">#</a></h4>
+<p>In order to circumvent the herd effect, we modify the above basic locking approach with the following:</p>
+<figure>
+    <img loading="lazy" src="/images/zk6.png"/> 
+</figure>
+
+<p>Now, this is a little bit more complex so I will try to explain it as clearly as I can. The understanding built here would be used in the next section (leader election) completely so please bear with me.</p>
+<p>So here instead of having a single ready-file for all the machines that want to acquire the lock, we create one file for each. So in the first step, each client creates a new ephemeral-sequential znode. This step will definitely pass as we are creating a new node and we will have the znode number with us.
+Now the client will do a getChildren call on the lock znode and fetch all the currently attached ephemeral znodes. In this list, it will check which is the smallest number. If its number is the smallest that means that the client now has the lock. So a simple smallest wins strategy is used to find a winner among the znodes.
+Now if this client does not have the smallest znode then it implies that someone else (who has the smallest znode currently) has the lock. So this client needs to wait. Again either it can keep checking using polling or set up notifications using the watch feature.
+This is where we do things differently and only set the watch on the znode with the number just less than the number of the current client. So each client has set up a notification on the one before them.
+In an ideal case, when the smallest number znode client is done, it will delete its znode. The next in line client will get a notification because it already has a watch set on this guy. It will go to step 2 and again fetch the children to ensure it is still the smallest and then proceed with the lock.
+In the case where a client dies unexpectedly, it is not hard to see that since the znode is ephemeral, it will notify the next in line client and then following the above steps that client would reset its watch correctly and things would work out.</p>
+<h4 id="leader-election">Leader Election<a hidden class="anchor" aria-hidden="true" href="#leader-election">#</a></h4>
+<p>If you understood the above section then this is a piece of cake. The strategy used for leader election via zk is exactly the same as above. Just consider a election znode instead of the lock znode. We will have the same setup as before and now the smallest number client will be called the leader instead of saying that it holds the lock. Rest everything remains the same.</p>
+<h3 id="conclusion">Conclusion<a hidden class="anchor" aria-hidden="true" href="#conclusion">#</a></h3>
+<p>If you have made it this far, I really hoped you found something of interest and learned something new about zookeeper. I know I have not talked about some of the more finer details of how zk works with eventual consistency. What other guarantees it provides (for eg. Client request FIFO ordering) which makes all the above work despite being eventually consistent. Maybe I don&rsquo;t understand these well enough right now to explain it clearly. But anyway, that is all for this post. Do checkout the references mentioned below to understand this better!</p>
+<h3 id="references">References<a hidden class="anchor" aria-hidden="true" href="#references">#</a></h3>
+<p><a href="https://www.usenix.org/legacy/event/atc10/tech/full_papers/Hunt.pdf">Zookeeper paper</a><br>
+<a href="https://www.youtube.com/watch?v=pbmyrNjzdDk">Lecture 8: Zookeeper - YouTube</a><br>
+<a href="http://www.sleberknight.com/blog/sleberkn/entry/distributed_coordination_with_zookeeper_part">Blog on Zookeeper</a></p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="http://localhost:1313/">My Musings</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

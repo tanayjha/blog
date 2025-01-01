@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>Evaluating million digits of Pi | My Musings</title>
+<meta name="keywords" content="">
+<meta name="description" content="I recently got inspired from a book I am reading, Fermat&rsquo;s Last Theorem by Simon Singh, and decided to see what it takes to evaulate Pi to a large number of decimal places. I though that a million would be a good starting point, so a day later, here we are.
+Now obviously, there is a lot of material out there on this as this seems to be a topic of great interest for a lot of people. I definitely find this fascinating but I also believe that there is no significance or meaning attached to the digits of pi. It is just a random string of numbers. However, I think this is true in mathematics as well as life that the things you have the most fun in doing eventually turns out to be those which you didn&rsquo;t do for some material gain.">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/blog/pievaluator/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.d72444526d7ecbdb0015438a7fa89054a658bf759d0542e2e5df81ce94b493ee.css" integrity="sha256-1yREUm1&#43;y9sAFUOKf6iQVKZYv3WdBULi5d&#43;BzpS0k&#43;4=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/blog/pievaluator/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="My Musings (Alt + H)">My Musings</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      Evaluating million digits of Pi
+    </h1>
+    <div class="post-meta"><span title='2022-08-16 00:24:13 +0530 IST'>August 16, 2022</span>&nbsp;·&nbsp;6 min
+
+</div>
+  </header> 
+
+  <div class="post-content"><p>I recently got inspired from a book I am reading, Fermat&rsquo;s Last Theorem by Simon Singh, and decided to see what it takes to evaulate Pi to a large number of decimal places. I though that a million would be a good starting point, so a day later, here we are.</p>
+<p>Now obviously, there is a lot of material out there on this as this seems to be a topic of great interest for a lot of people. I definitely find this fascinating but I also believe that there is no significance or meaning attached to the digits of pi. It is just a random string of numbers. However, I think this is true in mathematics as well as life that the things you have the most fun in doing eventually turns out to be those which you didn&rsquo;t do for some material gain.</p>
+<p>So, the first challenge was to figure out a formula for Pi which can help with this calculation. Now there are many obscure formulas for approximating Pi out there. <a href="https://en.wikipedia.org/wiki/Approximations_of_%CF%80">This</a> wikipedia page gives a good summary. Now, I had heard about the Ramanujan&rsquo;s formula for approximating Pi and also heard about how it converges very quickly and hence is being used in the recent development in this area to calculate more and more digits, so I wanted to try that one. However, I had to also keep in mind that I needed to code it (selected C# as the language, since I am already working on C# for one of my work related projects) and googling around a bit revealed that I would be better off using a formula that used a simple infinite series which can be coded relatively easily.</p>
+<p>I found <a href="https://www.cygnus-software.com/misc/pidigits.htm">this</a> blog which points to Machin&rsquo;s formula which uses arctans to define Pi. This is the formula:</p>
+<p><strong>PI/4 = atan(1) = 4 * atan(1/5) - atan(1/239)</strong></p>
+<p>where atan(x) is tan<!-- raw HTML omitted -->-1<!-- raw HTML omitted -->x which has the following taylor&rsquo;s expansion: atan(x) = x - x^3/3 + x^5/5 - x^7/7 + x^9/9..</p>
+<p>Now I have no clue how Machin found this formula for Pi. If you have a look at Ramanujan&rsquo;s formula you will be even more flabbergasted as that one makes no sense at all. At least the above formula has a easy way to verify that it <a href="https://en.wikipedia.org/wiki/Approximations_of_%CF%80#Machin-like_formula">actually works</a>.</p>
+<p>Based on the above blog post, I decided to use Machin&rsquo;s formula and write down an implementation of it. Now the blog mentions an InfPrec class which will do very precise decimal calculations (precise to 10^6 decimal places if we want to calculate a million digits) but doesn&rsquo;t mention how to code it. So this was the main challenge. For refernce, the double class in C++ has 15 digits of precision and long double has 21 digits. So they don&rsquo;t even come close in fitting the bill.</p>
+<p>Since I planned to use C#, one thing I could leverage was the <a href="https://docs.microsoft.com/en-us/dotnet/api/system.numerics.biginteger?view=net-6.0">BigInteger class</a>. This significantly reduces the amount of code needed as well as removes the low level complexity of doing the long multiplcation and divisions by hand. Obviously this can also be done with careful coding and most of you probably would have done it in your undergrad courses. It is a highly recommended excercise if you want to practice some implementation problem.
+One thing to note is that we have the BigInteger class but no BigDecimal class, so we have to deal with integers only. They could be very big integers (in our case containing a million digits) but they have to be integers nonetheless.</p>
+<p>So the first question that we have to answer is that how do we represent a rational number, say p/q as an integer. For example if you have a decimal number 0.25. Can we represent it using only integers? Yes we can. We can represent it as 25/100. Similarly all rational numbers p/q can be represented as a/10^k where a is a natural number. Now since we know in our calculations of pi to a million decimal places, we need a million decimal digits at max, so we can keep k to be a million. Once we standardise the base, we can just forget about it and only deal in terms of the natural number a. Whenever required, we can divide by 10^k to get back the original decimal number. This is the crux of the InfPrec class.</p>
+<p>Once I had Machin&rsquo;s formula figured out, I thought why not take it up a notch and also code Ramanujan&rsquo;s formula. Now there were different set of challenges with it. The most prominent one was that the formula contains a sqrt(2) which itself is irrational. Now to calculate pi to a million digits accurately using this formula, I also need sqrt(2) to a million digits. Which means I need to use my InfPrec class for this. Luckily, there is an <a href="https://stackoverflow.com/questions/15362117/find-as-many-digits-of-the-square-root-of-2-as-possible">infinite expansion</a> of sqrt(2). I used that one and coded up the Ramanujan formula correctly (although not efficiently)</p>
+<p>Here is the code using the above approach implementing both Machin&rsquo;s formula as well as Ramanujan&rsquo;s formula:</p>
+<script src="https://gist.github.com/tanayjha/98b93d7922378e855aeac6d916cbfb3c.js"></script>
+
+<p>For reference this is Ramanujan&rsquo;s formula for PI:</p>
+<figure>
+    <img loading="lazy" src="/images/photos/ramanujan_pi.png"/> 
+</figure>
+
+<p>This is what I have encoded in the above method.</p>
+<p>Now on running the program for different number of digits of pi starting from 10 and going upto a million, one thing is immediately obvious: Machin&rsquo;s formula requires almost 10 times the number of iteration Ramanujan&rsquo;s formula needs to reach the same level of accuracy. That is a very big gap. Ramanujan&rsquo;s formula is so effecient that it is infact even used today to calculate pi to a large number of digits efficiently.</p>
+<p>If we compare the runtimes, Machin formula is faster in the state I have implemented. I believe the reason is that each term in Ramanujan&rsquo;s formula is very computationally extensive. However, each term in Ramanujan&rsquo;s formula is also very parallelizable. All the terms are independent. I added a cache for the factorials and that also helps the runtime.</p>
+<p>Finally, here are the results for calculating a million digits of Pi:</p>
+<ul>
+<li>
+<p>Using Machin&rsquo;s formula:
+Iterations: 715346
+Time: 29 mins</p>
+</li>
+<li>
+<p>Using Ramanujan&rsquo;s formula:
+Iterations: 73428
+Time: 109 mins</p>
+</li>
+</ul>
+<figure>
+    <img loading="lazy" src="/images/photos/machin_pi.png"/> 
+</figure>
+
+<p>So, as expected, Ramanujan&rsquo;s formula converges much quicker but takes a much longer time due to my naive implementation. (I plan to make it faster in the future by adding parallelism)</p>
+<p>Apart from the story of number <a href="https://en.wikipedia.org/wiki/1729_(number)">1729</a>, I had never got a chance to actually connect with any of Ramanujan&rsquo;s work. It is probably because everything he worked on was so obscure and at such a high level that even after 100 years of his death mathematicians are stil decoding his notebooks. Now obviously, even through this excercise, I have just at a surface level, scratched the formula not even attempting to go into the mathematics inside it. This was the class of Ramanujan. I feel grateful to have been born in the same country as this genius. It reminds me of a quote said for Feynman but I think it fits equally well for Ramanujan if not more:</p>
+<blockquote>
+<p><!-- raw HTML omitted -->There are two types of genius. Ordinary geniuses do great things, but they leave you room to believe that you could do the same if only you worked hard enough. Then there are magicians, and you can have no idea how they do it. Ramanujan was a magician. <!-- raw HTML omitted --></p>
+</blockquote>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="http://localhost:1313/">My Musings</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

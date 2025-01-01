@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Blog Copies on My New Hugo Site</title>
+    <link>http://localhost:1313/blog-copy/</link>
+    <description>Recent content in Blog Copies on My New Hugo Site</description>
+    <generator>Hugo -- 0.140.2</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 28 Jan 2022 12:09:25 +0530</lastBuildDate>
+    <atom:link href="http://localhost:1313/blog-copy/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Book Review: Atomic Habits</title>
+      <link>http://localhost:1313/blog-copy/atomic-habits/</link>
+      <pubDate>Fri, 28 Jan 2022 12:09:25 +0530</pubDate>
+      <guid>http://localhost:1313/blog-copy/atomic-habits/</guid>
+      <description>&lt;p&gt;I recently completed this wonderful book by James Clear, &lt;a href=&#34;https://www.amazon.in/Atomic-Habits-James-Clear/dp/1847941834/ref=asc_df_1847941834/?tag=googleshopdes-21&amp;amp;linkCode=df0&amp;amp;hvadid=396987849297&amp;amp;hvpos=&amp;amp;hvnetw=g&amp;amp;hvrand=5229243871160487523&amp;amp;hvpone=&amp;amp;hvptwo=&amp;amp;hvqmt=&amp;amp;hvdev=c&amp;amp;hvdvcmdl=&amp;amp;hvlocint=&amp;amp;hvlocphy=1007820&amp;amp;hvtargid=pla-551566274852&amp;amp;psc=1&amp;amp;ext_vrnc=hi&#34;&gt;Atomic Habits&lt;/a&gt;. More than a book review, this is going to be a compilation of the learnings that I have from this book. The book is such a vast treasure chest of information that it is very easy to forget all of it. Even writing it down is probably not enough. The actual value of the book will come from the application of the concepts it teaches in our everyday life. But, to start things off, here goes my learnings from this great book.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

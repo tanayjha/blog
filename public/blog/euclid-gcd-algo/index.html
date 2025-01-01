@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>Euclids GCD Algorithm | My Musings</title>
+<meta name="keywords" content="">
+<meta name="description" content="This post is going to focus on a very simple concept, finding the GCD of two numbers. If you think this is too easy and we don&rsquo;t need a post on it, well you are probably right :D. You might even be knowing of efficient ways of finding the GCD (mostly used in competitive programming). But many of you may not be aware of the mathematics and proof behind how that method works. If that is the case, you are not alone. I was in the same boat for many years. I have used that 3 line GCD method many times in solving programming questions never thinking deeply about why it works. There is no issue in this. After all there is a good reason why abstraction is so popular. But I do believe that when you get a chance there is no harm in diving deep. You may get to learn a few things and as always be fascinated by what math has to offer even in the simplest of concepts. So lets begin&hellip;">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/blog/euclid-gcd-algo/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.d72444526d7ecbdb0015438a7fa89054a658bf759d0542e2e5df81ce94b493ee.css" integrity="sha256-1yREUm1&#43;y9sAFUOKf6iQVKZYv3WdBULi5d&#43;BzpS0k&#43;4=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/blog/euclid-gcd-algo/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="My Musings (Alt + H)">My Musings</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      Euclids GCD Algorithm
+    </h1>
+    <div class="post-meta"><span title='2021-03-08 12:09:25 +0530 IST'>March 8, 2021</span>&nbsp;·&nbsp;7 min
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#context" aria-label="Context">Context</a></li>
+                <li>
+                    <a href="#the-division-algorithm" aria-label="The Division Algorithm">The Division Algorithm</a></li>
+                <li>
+                    <a href="#the-eucledian-algorithm" aria-label="The Eucledian Algorithm">The Eucledian Algorithm</a></li>
+                <li>
+                    <a href="#complexity-analysis" aria-label="Complexity analysis">Complexity analysis</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>This post is going to focus on a very simple concept, finding the <a href="https://en.wikipedia.org/wiki/Greatest_common_divisor#:~:text=In%20mathematics%2C%20the%20greatest%20common,divides%20each%20of%20the%20integers">GCD</a> of two numbers. If you think this is too easy and we don&rsquo;t need a post on it, well you are probably right :D. You might even be knowing of efficient ways of finding the GCD (mostly used in competitive programming). But many of you may not be aware of the mathematics and proof behind how that method works. If that is the case, you are not alone. I was in the same boat for many years. I have used that <a href="https://en.wikipedia.org/wiki/Euclidean_algorithm#Implementations">3 line GCD</a> method many times in solving programming questions never thinking deeply about why it works. There is no issue in this. After all there is a good reason why abstraction is so popular. But I do believe that when you get a chance there is no harm in diving deep. You may get to learn a few things and as always be fascinated by what math has to offer even in the simplest of concepts. So lets begin&hellip;</p>
+<h3 id="context">Context<a hidden class="anchor" aria-hidden="true" href="#context">#</a></h3>
+<p>Now we all know one way at least of finding the GCD of two numbers. Find all the factors of both the numbers and find the one which is common between the two and which is the largest. Well agreed this is just a repeat of the definition of GCD but if you do exactly this you will find the GCD which makes sense. The problem is that this method is not very efficient. It&rsquo;s probably fine to do this when the numbers you are calculating GCD for are small but things start to get ugly as the numbers become big.
+So we need a more systematic and efficient method of calculating the GCD which is exactly the purpose of this blog.
+But before we understand that method lets start with some basic definition and we will build up our theory from there.</p>
+<h3 id="the-division-algorithm">The Division Algorithm<a hidden class="anchor" aria-hidden="true" href="#the-division-algorithm">#</a></h3>
+<p>When solving things from first principles, we have to get down at the basic level. Once you go down there, you realize how many things we take for granted without having the proper proof. Again, I am not advocating that you should prove everything you use, but at least trying that can be a fun and educational activity. So I am going to do that. I feel it gives more confidence in the final result.</p>
+<p>So lets start with the statement of the division algorithm.</p>
+<p>Given integers a and b with b &gt; 0, there exists unique integers q and r satisfying, a = bq + r, 0 &lt;= r &lt; b.</p>
+<p><strong>Proof</strong>: First we need to prove the existence of numbers q and r. Then we will focus on uniqueness.</p>
+<p>Lets begin by proving that the set S = { a - xb | x is an integer, a - xb &gt;= 0 } is non empty.
+So we need to find an integer x such that a - xb &gt;= 0. We know that b &gt;= 1 and a is an integer.
+Lets take x = -|a|. Substituting that in we get, a - (-|a|.b) = a + |a|b &gt;= a + |a| (as b &gt;= 1) &gt;= 0. Hence this lies in S and S is non empty. By the <a href="https://en.wikipedia.org/wiki/Well-ordering_principle">Well Ordering Principle</a>, the set contains a least element, lets call it r. So there exists some integer q for which r = a - qb where r &gt;= 0.</p>
+<p>We argue that r &lt; b. We can prove this by contradiction. Assume r &gt;= b. Consider the number,
+a - (q + 1)b = (a - qb) - b = r - b &gt;= 0 also r - b &lt; r contradicting r as the smallest element in the set S. Hence r &lt; b. This proves existence of q and r in the division algorithm. Lets now prove the uniqueness.</p>
+<p>Again we start with a contradiction that there are two values, q1, q2 and r1, r2 satisfying this equation.
+So a = bq1 + r1 and a = bq2 + r2 where 0 &lt;= r1 &lt; b and 0 &lt;= r2 &lt; b.
+=&gt; bq1 + r1 = bq2 + r2 =&gt; r1 - r2 = b(q2- q1).
+Now since r1 and r2 are both &lt; b =&gt; -b &lt; r1 - r2 &lt; b =&gt; 0 &lt;= (q2 - q1) &lt; 1 and since q2 - q1 is an integer it must be 0. =&gt; q1 = q2 and r1 = r2 thereby completing the proof.</p>
+<h3 id="the-eucledian-algorithm">The Eucledian Algorithm<a hidden class="anchor" aria-hidden="true" href="#the-eucledian-algorithm">#</a></h3>
+<p>Now, lets start interacting with the gcd and take the first step towards euclids algorithm. We first introduce a lemma which will more or less pave the way to the actual algorithm.</p>
+<p><strong>Lemma</strong>: If a = bq + r then gcd(a, b) = gcd(b, r).</p>
+<p><strong>Proof</strong>: This statement did not look obvious to me at least in anyway. So the only way to convince ourselves that this is true is by proving it.</p>
+<p>Lets say gcd(a, b) = d =&gt; d | a and d | b also for all e such that e | a and e | b, e | d. (note that this is actually the definition of GCD expressed in mathematical terms)</p>
+<p>Now if d | a and d | b =&gt; d | a - bq =&gt; d | r. So d is definitely a candidate to be the gcd(b, r) since it divides both b and r.
+But we don&rsquo;t know if it is the highest such divisor. Lets assume its not and assume that there is an integer e which is the gcd(b, r) =&gt; e | b and e | r. So e | bq + r =&gt; e | a.
+Now gcd(a, b) = d. And since e | a and e | b, e &lt;= d. Since if e &gt; d, then e should have been the gcd of a and b. This proves that d is also the gcd(b, r) thereby proving the lemma.</p>
+<p>Now that we have proved this seemingly unintuitive result, here comes the masterstroke step of euclids algorithm. We apply the division algorithm repeatedly, giving us the following set of equations:</p>
+<p>a = bq + r, 0 &lt; r &lt; b
+b = rq1 + r1, 0 &lt; r1 &lt; r
+r = r1q2 + r2, 0 &lt; r2 &lt; r1
+r1 = r2q3 + r3, 0 &lt; r3 &lt; r2
+.
+.
+.
+rn-1= rnqn+1 + rn+1, where rn+1 = 0.</p>
+<p>Basically we claim that since the remainders, r1, r2 etc. are strictly decreasing, it will become 0 after n number of steps. (max b steps to be precise).</p>
+<p>Now if we apply the above gcd lemma to these equations sequentially we will get the following:</p>
+<p>gcd(a, b) = gcd(b, r) = gcd(r, r1) &hellip; = gcd(rn-1, rn) = gcd(rn, 0) = rn</p>
+<p>The above statement basically gives us a new method of finding the gcd of two numbers. Simply put, it says to apply the division algorithm repeatedly to the numbers and once the remainder becomes 0 (which it eventually will), the quotient at that stage is the gcd.</p>
+<p>Here is the 3 line method of GCD calculation now.</p>
+<figure>
+    <img loading="lazy" src="/images/gcd.png"/> 
+</figure>
+
+<p>If you understand recursion well. shouldn&rsquo;t be hard to see how this is exactly the code conversion of the process illustrated above and why this should give the GCD.</p>
+<h3 id="complexity-analysis">Complexity analysis<a hidden class="anchor" aria-hidden="true" href="#complexity-analysis">#</a></h3>
+<p>The time complexity of this method is log(max(a, b)). So basically logarithmic. I tried reading the proof of this but it is a bit complicated. Turns out the worst case happens with consecutive fibonaaci numbers and is related to the golden ration. Definitely seems like a good thing to explore.
+However not going to do that in this post. Anyway, I will have to read about it first myself to get a proper understanding. Maybe in a future post..</p>
+<p><strong>Update</strong>: Read around a bit and found a few sources. This is the concrete analysis of the runtime as given by Knuth in his TOACP book. I found it to be very involved and difficult to understand. Feel free to give it a shot if you want.
+This on the other hand is a little less rigorous but still a good proof of the logarithmic runtime. It uses very simple arguments and shouldn&rsquo;t be hard to understand. Feel free to go through it.</p>
+<p>Hopefully this post gives you more confidence in using the Euclidean method of finding the GCD from now on. And even if you never use it, who cares. What would matter is how the proof made you feel and not if it was useful :)</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="http://localhost:1313/">My Musings</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

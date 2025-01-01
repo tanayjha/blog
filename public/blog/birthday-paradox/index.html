@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>Birthday Paradox | My Musings</title>
+<meta name="keywords" content="">
+<meta name="description" content="Context
+This is going to be a quick blogpost on the birthday paradox. This is a famous probability theory problem, which asks for the probability that, in a set of n randomly chosen people, at least two will share a birthday.
+This is called a paradox and for a good reason. The solution to this problem is very counter-intuitive. This blog post is going to be an attempt to use some computer science and maths to analyze this problem and figure out why this is called a paradox.">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/blog/birthday-paradox/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.d72444526d7ecbdb0015438a7fa89054a658bf759d0542e2e5df81ce94b493ee.css" integrity="sha256-1yREUm1&#43;y9sAFUOKf6iQVKZYv3WdBULi5d&#43;BzpS0k&#43;4=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/blog/birthday-paradox/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="My Musings (Alt + H)">My Musings</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      Birthday Paradox
+    </h1>
+    <div class="post-meta"><span title='2024-07-28 00:24:13 +0530 IST'>July 28, 2024</span>&nbsp;·&nbsp;5 min
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#context" aria-label="Context">Context</a></li>
+                <li>
+                    <a href="#some-maths" aria-label="Some Maths">Some Maths</a></li>
+                <li>
+                    <a href="#some-cs" aria-label="Some CS">Some CS</a><ul>
+                        
+                <li>
+                    <a href="#monte-carlo-simulation" aria-label="Monte Carlo Simulation">Monte Carlo Simulation</a></li></ul>
+                </li>
+                <li>
+                    <a href="#code" aria-label="Code">Code</a></li>
+                <li>
+                    <a href="#results" aria-label="Results">Results</a></li>
+                <li>
+                    <a href="#conclusion" aria-label="Conclusion">Conclusion</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h2 id="context">Context<a hidden class="anchor" aria-hidden="true" href="#context">#</a></h2>
+<p>This is going to be a quick blogpost on the <a href="https://en.wikipedia.org/wiki/Birthday_problem">birthday paradox</a>. This is a famous probability theory problem, which asks for the probability that, in a set of n randomly chosen people, at least two will share a birthday.
+This is called a paradox and for a good reason. The solution to this problem is very counter-intuitive. This blog post is going to be an attempt to use some computer science and maths to analyze this problem and figure out why this is called a paradox.</p>
+<h2 id="some-maths">Some Maths<a hidden class="anchor" aria-hidden="true" href="#some-maths">#</a></h2>
+<p>The first time I had seen this problem, it was framed like this: &ldquo;If there are more than 23 people in a room there is a more than 50 percent chance that at least two people have the same birthday&rdquo;. My mind was blown when I read this and obviously the initial reaction was that this is not possible.
+However, after using some basic probablity theory I was able to convince myself that this is indeed the case.</p>
+<p>Let&rsquo;s look at some math to derive this:</p>
+<p>Let p be the probability that no two people in a room have the same birthday. Also let us assume there are 365 days in a year (lets leave out leap years to make calculations simpler).
+Now the probablity that at least two people will have the same birthday will be (1 - p).</p>
+<p>Now lets try to see if the statement above i.e if there are 23 people in a room, then the probability of same birthday is &gt; 50% is true or not.</p>
+<p>Lets try to calculate p first, i.e all the 23 people have different birthday.
+Once we have p, we can calculate same birthday case with (1 - p) where the statement claims that it is &gt; 0.5. Hence, p has to be &lt; 0.5.</p>
+<p>In order to calculate p, lets try to assign birthday to these 23 people one by one ensuring there is no collision.
+So the first person can have a birthday on any of the 365 days. But the second person only has 364 choices (cannot pick the day the first person has their birthday on). The third person will have 363 choices and so on. Finally the 23rd person will have (365 - 23 + 1) = 343 choices.</p>
+<p>Hence probability that none of them have birthdays on the same day is a product of all these choices, i.e:</p>
+<p>365/365 * 364/365 * 363/365 * &hellip; * 343/365</p>
+<p>I don&rsquo;t know if there is an easy way to do this calculation by hand but if you use a computer/calculator to do this you will see that this indeed comes out to be 49.27 which means (1 - p) i.e probability of at least two same birthdays is 50.72 hence proving the statement.</p>
+<h2 id="some-cs">Some CS<a hidden class="anchor" aria-hidden="true" href="#some-cs">#</a></h2>
+<p>With the above mathematics we did, we were able to kind of define a pattern to calculate the probability of two people having same birthday given a number of people. Once we are able to define a function like this, we can convert it into a computer program and allow the computer to do all this hard work and we can sit back and enjoy the result. I did exactly this.</p>
+<h3 id="monte-carlo-simulation">Monte Carlo Simulation<a hidden class="anchor" aria-hidden="true" href="#monte-carlo-simulation">#</a></h3>
+<p>Apart from implementing the above probability calculation in a python program, I also implemented a random simulation for this. This is also called <a href="https://en.wikipedia.org/wiki/Monte_Carlo_method">Monte Carlo Simulation</a>. You probably already know this. Let me explain by an example of a coin toss.
+If you toss a coin, we know that the probability is 50% for a heads and 50% for a tails. You also would have heard that you can actually run this experiment multiple times to convince yourself that this is indeed the case. So for eg., if you toss a coin 10 times, it is possible you get 4 tails and 6 heads. However, as you keep on increasing the number of coin tosses, this probability will keep on shifting towards 50%.
+We can implement this idea in code by using the random library to simulate a coin toss. This is what I did for the birthday problem. Lets see how the code looks like for these two approaches.</p>
+<h2 id="code">Code<a hidden class="anchor" aria-hidden="true" href="#code">#</a></h2>
+<script src="https://gist.github.com/tanayjha/2fb33ba128bb1c2282246f7186403ff5.js"></script>
+
+<h2 id="results">Results<a hidden class="anchor" aria-hidden="true" href="#results">#</a></h2>
+<p>The code runs in two modes, first is the math aspect of getting the probability of same birthday as the number of people in the room increases from 1 to 100. It plots a graph of the number of people in the room on the x-axis and the probability of same birthday on the y-axis. Here is the graph:</p>
+<figure>
+    <img loading="lazy" src="/images/birthdayParadox/peopleVsProb.png"/> 
+</figure>
+
+<p>I have also marked two points of interest on the graph. The first is the point where the probability crosses 50% and second is the point where it crosses 99%.
+As expected, the first point is at 23 (as seen in the maths section) and the second point is at 57. This means that as soon as the number of people in a room increases to 57, there is a <strong>99%</strong> chance that two people have the same birthday. This is literally insane!!</p>
+<p>And now for the simulation, I tried simulating the probability of same birthday when 30 people are in a room. And here are the results of the simulation:</p>
+<p>
+<div style="display: flex;">
+    <div style="flex: 1; padding: 5px;">
+      <img src="/images/birthdayParadox/50Simul.png" alt="First Image" style="width: 100%; height: auto;">
+    </div>
+    <div style="flex: 1; padding: 5px;">
+      <img src="/images/birthdayParadox/100Simul.png" alt="Second Image" style="width: 100%; height: auto;">
+    </div>
+  </div>
+  
+
+<div style="display: flex;">
+    <div style="flex: 1; padding: 5px;">
+      <img src="/images/birthdayParadox/1000Simul.png" alt="First Image" style="width: 100%; height: auto;">
+    </div>
+    <div style="flex: 1; padding: 5px;">
+      <img src="/images/birthdayParadox/10kSimul.png" alt="Second Image" style="width: 100%; height: auto;">
+    </div>
+  </div>
+  </p>
+<p>It can be seen that as we increase the number of experiments the probability very clearly converges to 70% which is as per expectation. Hence the Monte Carlo simulation can be used as a tool to solve this problem.</p>
+<h2 id="conclusion">Conclusion<a hidden class="anchor" aria-hidden="true" href="#conclusion">#</a></h2>
+<p>Hopefully through this blogpost you got a taste of how counter-intuitive probability can be and how well computer science can aid us in solving some of these probablistic problems with random library and graphs.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="http://localhost:1313/">My Musings</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

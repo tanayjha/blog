@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>Consistent Hashing | My Musings</title>
+<meta name="keywords" content="">
+<meta name="description" content="I have been meaning to write this blog for some time now but somehow kept on postponing (read procrastinating&hellip;). I read about this technique of Consistent Hashing a while back and was mesmerized by its elegance. Recently read it again in this brilliant blog and thought of expressing it in my own words for posterity. So let us begin.
+Hashing
+I won&rsquo;t talk too much about hashing since it is a very basic computer science concept. In a word, it means mapping an object to another object. Or more generally, mapping a key to a value where their types don&rsquo;t matter. Mostly the mapping is from a string to int.">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/blog/consistent-hashing/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.d72444526d7ecbdb0015438a7fa89054a658bf759d0542e2e5df81ce94b493ee.css" integrity="sha256-1yREUm1&#43;y9sAFUOKf6iQVKZYv3WdBULi5d&#43;BzpS0k&#43;4=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/blog/consistent-hashing/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="My Musings (Alt + H)">My Musings</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      Consistent Hashing
+    </h1>
+    <div class="post-meta"><span title='2022-06-22 12:09:25 +0530 IST'>June 22, 2022</span>&nbsp;·&nbsp;5 min
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#hashing" aria-label="Hashing">Hashing</a></li>
+                <li>
+                    <a href="#consistent-hashing" aria-label="Consistent Hashing">Consistent Hashing</a></li>
+                <li>
+                    <a href="#use-case" aria-label="Use Case">Use Case</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>I have been meaning to write this blog for some time now but somehow kept on postponing (read procrastinating&hellip;). I read about this technique of Consistent Hashing a while back and was mesmerized by its elegance. Recently read it again in this brilliant blog and thought of expressing it in my own words for posterity. So let us begin.</p>
+<h3 id="hashing">Hashing<a hidden class="anchor" aria-hidden="true" href="#hashing">#</a></h3>
+<p>I won&rsquo;t talk too much about hashing since it is a very basic computer science concept. In a word, it means mapping an object to another object. Or more generally, mapping a key to a value where their types don&rsquo;t matter. Mostly the mapping is from a string to int.</p>
+<p>There could be multiple different hash functions that can exist which randomize the how the keys are hashed to the values. We are going to consider a simple use case where let&rsquo;s say you have N different servers and there are multiple keys that you want to distribute among those servers. How do you do it?</p>
+<p>Well, a simple strategy is that you have a function which applies some logic to map the keys to an integer value. So, f(key) = some integer value, say val. And now since there are N servers we have to distribute them to, we can take val%N which will give us an integer in [0, N - 1] and based on the result we can send the key to the corresponding server.
+This works out pretty well if the number of servers remain constant (i.e N). However, we know that when dealing with distributed systems, assuming the servers won&rsquo;t go down is pretty unreasonable. Also, in many cases you may want to add more servers to handle more traffic so the number of servers can go up as well as go down.
+If we use the same approach (taking %N) as above, each time the number of servers change, we will have to re-hash all the keys with the new number of servers available. This would lead to a lot of unnecessary moving around of keys across the servers. This would also break any local caching present on the servers. This is actually one of the problems faced by distributed databases.
+Hence we want to find out a solution where if the number of servers change, we don&rsquo;t have to rehash a large number of keys. This is where consistent hashing comes into the picture.</p>
+<h3 id="consistent-hashing">Consistent Hashing<a hidden class="anchor" aria-hidden="true" href="#consistent-hashing">#</a></h3>
+<p>The concept of consistent hashing is very straightforward, and it has to do with circles. Basically, if we can map our keys as well as servers on a ring, consistent hashing claims that we can solve the re-hashing problem in case the servers go up or down.</p>
+<p>Let us assume that we have three servers - A, B and C. Also say we have five keys, John, Steve, Bill, Kate and Jane. For doing consistent hashing, we need to map all these entities on to a ring. A simple way to do that is to define a function f such that f(key) = theta (where 0 &lt;= theta &lt;= 360). So now theta can be considered as an angle and therefore can be mapped onto a circle.</p>
+<p>Applying the above strategy here is how the keys will look like after the mapping:</p>
+<figure>
+    <img loading="lazy" src="/images/hashing.png"/> 
+</figure>
+
+<p>And once everything is mapped, we define a simple rule that a key would belong to the server which is closest to it in the anticlockwise (or clockwise, doesn&rsquo;t matter) direction. So based on this rule it is easy to see that John maps to server C, Bill maps to B, Jane maps to A and so on.</p>
+<p>Why is this beneficial you ask? Well let&rsquo;s consider a server goes down. Say server B in the diagram above. How many keys will be shifted? Only those that were mapped to B. In this case that is only 1. Bill will now map to server C (closest anticlockwise in the new setup) instead of B.
+This was a small example, but even with a large number of keys, with a good distribution, the number of keys that will have to be shifted would be very less in comparison to our %N approach.</p>
+<p>Moreover, this mapping on a ring strategy allows us to incorporate the server capacity into consideration in a very cool way. Let&rsquo;s say some servers are bigger than other servers and can handle more keys. All we need to do is create more copies of that server on this ring. So for eg. if server A can handle twice the load than server B, we can create two copies of A, say A0 and A1 and map both of them to the ring. It is easy to see that with random distribution the number of keys mapped to A (A0 + A1) will be twice as many mapped to B.</p>
+<h3 id="use-case">Use Case<a hidden class="anchor" aria-hidden="true" href="#use-case">#</a></h3>
+<p>Consistent hashing is an incredibly useful technique and used across various distributed systems. Known examples of consistent hashing use include (<a href="https://en.wikipedia.org/wiki/Consistent_hashing#Examples">from wikipedia</a>):</p>
+<ul>
+<li>Couchbase automated data partitioning</li>
+<li>Partitioning component of Amazon&rsquo;s storage system Dynamo</li>
+<li>Data partitioning in Apache Cassandra</li>
+<li>Data partitioning in Voldemort</li>
+<li>Akka&rsquo;s consistent hashing router</li>
+<li>Riak, a distributed key-value database</li>
+<li>Akamai content delivery network</li>
+<li>Discord chat application</li>
+</ul>
+<p>Hope this blog gives you a good understanding of consistent hashing and why it is so useful. The technique is a very useful one and whenever you have to hash things in a distributed system always consider if this technique can be applied there or not.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="http://localhost:1313/">My Musings</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

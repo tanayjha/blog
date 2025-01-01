@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>Maximum Flow | My Musings</title>
+<meta name="keywords" content="">
+<meta name="description" content="PROBLEM DESCRIPTION
+The problem of finding the maximum flow in a network, has a history which dates back to the second world war.
+Practically the maximum flow problem can be stated as:
+“A list of pipes is given, with different flow-capacities. These pipes are connected at their endpoints. What is the maximum amount of water that you can route from a given starting point to a given ending point?” or equivalently “A company owns a factory located in city X where products are manufactured that need to be transported to the distribution center in city Y. You are given the one-way roads that connect pairs of cities in the country, and the maximum number of trucks that can drive along each road. What is the maximum number of trucks that the company can send to the distribution center?”">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/blog/max-flow/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.d72444526d7ecbdb0015438a7fa89054a658bf759d0542e2e5df81ce94b493ee.css" integrity="sha256-1yREUm1&#43;y9sAFUOKf6iQVKZYv3WdBULi5d&#43;BzpS0k&#43;4=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/blog/max-flow/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="My Musings (Alt + H)">My Musings</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      Maximum Flow
+    </h1>
+    <div class="post-meta"><span title='2017-04-19 12:09:25 +0530 IST'>April 19, 2017</span>&nbsp;·&nbsp;4 min
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#problem-description" aria-label="PROBLEM DESCRIPTION">PROBLEM DESCRIPTION</a></li>
+                <li>
+                    <a href="#constraints" aria-label="CONSTRAINTS">CONSTRAINTS</a></li>
+                <li>
+                    <a href="#representation" aria-label="REPRESENTATION">REPRESENTATION</a></li>
+                <li>
+                    <a href="#residual-graph" aria-label="RESIDUAL GRAPH">RESIDUAL GRAPH</a></li>
+                <li>
+                    <a href="#maximum-flow-condition" aria-label="MAXIMUM FLOW CONDITION">MAXIMUM FLOW CONDITION</a></li>
+                <li>
+                    <a href="#ford-fulkerson-algorithm" aria-label="FORD-FULKERSON ALGORITHM">FORD-FULKERSON ALGORITHM</a></li>
+                <li>
+                    <a href="#implementation" aria-label="IMPLEMENTATION">IMPLEMENTATION</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h3 id="problem-description">PROBLEM DESCRIPTION<a hidden class="anchor" aria-hidden="true" href="#problem-description">#</a></h3>
+<p>The problem of finding the maximum flow in a network, has a history which dates back to the second world war.</p>
+<p>Practically the maximum flow problem can be stated as:
+“A list of pipes is given, with different flow-capacities. These pipes are connected at their endpoints. What is the maximum amount of water that you can route from a given starting point to a given ending point?” or equivalently “A company owns a factory located in city X where products are manufactured that need to be transported to the distribution center in city Y. You are given the one-way roads that connect pairs of cities in the country, and the maximum number of trucks that can drive along each road. What is the maximum number of trucks that the company can send to the distribution center?”</p>
+<p>Formally stated the problem is:
+We are given a network - a directed graph, in which every edge has a certain capacity c associated with it, a starting vertex (called the source), and an ending vertex (called the sink). We are asked to associate another value f(called the flow) for each edge such that for every vertex other than the source and the sink, the sum of the values associated to the edges that enter it must equal the sum of the values associated to the edges that leave it. Furthermore, we are asked to maximize the sum of the values associated to the arcs leaving the source, which is the total flow in the network (which is the same as the sum of the arcs flowing into the sink).</p>
+<h3 id="constraints">CONSTRAINTS<a hidden class="anchor" aria-hidden="true" href="#constraints">#</a></h3>
+<p>A flow in the network will have the following constraints:</p>
+<ol>
+<li>Fi &lt;= Ci  for all i ∈ Edges of the network</li>
+<li>Flow in = Flow out ∀ Vertices ≠ s (source), t (sink)</li>
+</ol>
+<p>The first constraint states that the flow on an edge should not exceed it&rsquo;s capacity.
+The second constraint states that the flow into any vertex should equal the flow outside the vertex for all vertex except the source and the sink.</p>
+<h3 id="representation">REPRESENTATION<a hidden class="anchor" aria-hidden="true" href="#representation">#</a></h3>
+<p>So the network looks something like this:</p>
+<!-- raw HTML omitted -->
+<p>The representation a/b on every edge represents the flow/capacity for that particular edge. The flow in the network can be calculated as the total flow leaving the source i.e 3+2 = 5 in the above example. Obviously, the above two constraints must be followed for the flow to be a valid flow.</p>
+<h3 id="residual-graph">RESIDUAL GRAPH<a hidden class="anchor" aria-hidden="true" href="#residual-graph">#</a></h3>
+<p>Now we define the concept of residual graph.</p>
+<p>The residual graph of graph G is denoted by Gf and is constructed by using the following two rules for every edge in G:</p>
+<ol>
+<li>For every edge with flow fi in G draw a forward edge with capacity ci - fi in Gf. This is also called the residual flow.</li>
+<li>For every edge with flow fi in G draw a backward edge with capacity fi in Gf. This is also called the backward flow. The main purpose of this edge is to undo the flow already sent into the network.</li>
+</ol>
+<figure>
+    <img loading="lazy" src="http://www.cs.yale.edu/homes/aspnes/pinewiki/attachments/MaxFlow/residualGraph2.png"/> 
+</figure>
+
+<p>In the diagram above, we see a flow network G and it&rsquo;s corresponding residual graph Gf.</p>
+<h3 id="maximum-flow-condition">MAXIMUM FLOW CONDITION<a hidden class="anchor" aria-hidden="true" href="#maximum-flow-condition">#</a></h3>
+<p>Now that we have defined a residual graph, we make a statement for the maximum flow in the network.
+A flow in the network can be called the maximum flow if and only if, the residual graph corresponding to that flow does not have any s-t path
+An s-t path in the graph is a path from the source to the sink which consists only of forward edges with positive residual capacity.
+To see why the above statement is true we can try and prove the contrapositive of this statement that: if there is an s-t path in the residual graph then it implies that the current flow is not maximum. This is quite evident as if there exists an s-t path then we can simply push the maximum possible flow along that path thereby increasing the flow.</p>
+<h3 id="ford-fulkerson-algorithm">FORD-FULKERSON ALGORITHM<a hidden class="anchor" aria-hidden="true" href="#ford-fulkerson-algorithm">#</a></h3>
+<p>The Ford-Fulkerson algorithm consists of the following steps:</p>
+<p>Step 1: Find a s-t path in Gf (residual graph) using DFS/BFS.
+Step 2: Find the edge having the minimum value in the s-t path chosen in step 1.
+Step 3: Push the minimum flow calculated in step 2 along the s-t path.
+Step 4: Reconstruct the residual graph from the graph with the updated flow in step 3.
+Step 5: If there are no more s-t path in the residual graph then terminate the algorithm.</p>
+<h3 id="implementation">IMPLEMENTATION<a hidden class="anchor" aria-hidden="true" href="#implementation">#</a></h3>
+<p>The implementation of this algorithm is pretty straight forward. Here I provide one using C++ with STL.</p>
+<script src="https://gist.github.com/tanayjha/80f62b58e730b79d3236cbf0d28920f4.js"></script>
+
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="http://localhost:1313/">My Musings</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

@@ -1,0 +1,17 @@
+baseURL = 'http://tanayjhablog.com/'
+languageCode = 'en-us'
+title = 'My Musings'
+theme = "PaperMod"
+
+[params.profileMode]
+enabled = true
+title = 'My Tryst With CS'
+subtitle = "My journey as a software developer"
+imageUrl = "images/blogpic.jpeg"
+imageTitle = "Me"
+imageWidth = 120
+imageHeight = 120
+
+[[params.profileMode.buttons]]
+  name = "Blog"
+  url = "/blog"

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>Chinese Remainder Theorem | My Musings</title>
+<meta name="keywords" content="">
+<meta name="description" content="In this post I would like to talk about the Chinese Remainder Theorem. You might have heard this problem as a kid: There are x number of things. When taken in groups of 5, they leave a remainder 1. When taken in groups of 7, they leave a remainder 2. When taken in groups of 9, they leave a remainder 3. And when taken in groups of 11, they leave a remainder 4. Find the value of x. We will see how such problems can be solved using the Chinese Remainder Theorem(CRT).">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/blog/chinese-remainder-theorem/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.d72444526d7ecbdb0015438a7fa89054a658bf759d0542e2e5df81ce94b493ee.css" integrity="sha256-1yREUm1&#43;y9sAFUOKf6iQVKZYv3WdBULi5d&#43;BzpS0k&#43;4=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/blog/chinese-remainder-theorem/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="My Musings (Alt + H)">My Musings</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      Chinese Remainder Theorem
+    </h1>
+    <div class="post-meta"><span title='2017-04-26 12:09:25 +0530 IST'>April 26, 2017</span>&nbsp;·&nbsp;9 min
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#linear-congruences" aria-label="LINEAR CONGRUENCES">LINEAR CONGRUENCES</a></li>
+                <li>
+                    <a href="#diophantine-equation" aria-label="DIOPHANTINE EQUATION">DIOPHANTINE EQUATION</a></li>
+                <li>
+                    <a href="#back-to-linear-congruence" aria-label="BACK TO LINEAR CONGRUENCE">BACK TO LINEAR CONGRUENCE</a></li>
+                <li>
+                    <a href="#system-of-simultaneous-linear-congruence" aria-label="SYSTEM OF SIMULTANEOUS LINEAR CONGRUENCE">SYSTEM OF SIMULTANEOUS LINEAR CONGRUENCE</a></li>
+                <li>
+                    <a href="#chinese-remainder-theorem" aria-label="CHINESE REMAINDER THEOREM">CHINESE REMAINDER THEOREM</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>In this post I would like to talk about the Chinese Remainder Theorem. You might have heard this problem as a kid: <strong>There are x number of things. When taken in groups of 5, they leave a remainder 1. When taken in groups of 7, they leave a remainder 2. When taken in groups of 9, they leave a remainder 3. And when taken in groups of 11, they leave a remainder 4. Find the value of x.</strong> We will see how such problems can be solved using the Chinese Remainder Theorem(CRT).</p>
+<h3 id="linear-congruences">LINEAR CONGRUENCES<a hidden class="anchor" aria-hidden="true" href="#linear-congruences">#</a></h3>
+<p>Lets talk about linear congruences. You might have already encountered them informally in my previous post on the RSA encryption system. Here I would like to introduce it a bit more formally.</p>
+<p><strong>ax ≡ b (mod n)</strong></p>
+<p>Abusing the use of notation, we can express this equation into a form which might look more familiar, i.e <strong>ax%n = b</strong>. In other words, the integer ax when divided by n leaves a remainder equal to b.</p>
+<p>Lets say that we find a solution to the above equation, say x = x0.
+=&gt; ax0 ≡ b (mod n)
+=&gt; n | (ax0 - b) (where | stands for divide)
+=&gt; ax0 - b = ny0
+=&gt; <strong>ax0 - ny0 = b</strong> &hellip;.. (1)</p>
+<p>Hence the linear congruence equation reduces to the well known <strong>diophantine equation</strong>. If you are familiar with the diophantine equation, feel free to skip the next part.</p>
+<h3 id="diophantine-equation">DIOPHANTINE EQUATION<a hidden class="anchor" aria-hidden="true" href="#diophantine-equation">#</a></h3>
+<p>The most general form of the diophantine equation is: <strong>ax + by = c</strong></p>
+<p>Lets try to analyse this equation for integer solutions.
+It is easy to see that this equation will have infinite integer solutions as it is the equation of a line. Hence all the integer (x, y) points on the line, will satisfy this equation.</p>
+<p>But it might be the case that this equation does not possess any integer solution. This can happen when the line does not pass through any integer (x, y) coordinate. Let us try to find that condition mathematically.</p>
+<p>Let, <strong>d = gcd(a, b)</strong> hence a = rd and b = sd where gcd(r, s) = 1
+Replacing the value of a and b in the original diophantine equation, we get,</p>
+<p>=&gt; rdx + sdy = c
+=&gt; d(rx + sy) = c
+=&gt; <strong>d | c</strong> (As c/d is an integer from the above equation)</p>
+<p>Hence the condition for the diophantine equation ax + by = c to have integer solution is <strong>d | c, where d = gcd(a, b)</strong>.</p>
+<p>Now lets find the family of solution for the diophantine equation. Lets say that we have found a solution <strong>(x0, y0)</strong> for the equation. Now we want to find another solution say (x&rsquo;, y')</p>
+<p>=&gt; ax0 + by0 = ax&rsquo; + by&rsquo; = c
+=&gt; a(x&rsquo; - x0) = b(y0 - y&rsquo;)
+=&gt; rd(x&rsquo; - x0) = sd(y0 - y&rsquo;)   (d = gcd(a, b))
+=&gt; r(x&rsquo; - x0) = s(y0 - y&rsquo;)
+=&gt; r | s(y0 - y&rsquo;)
+=&gt; r | (y0 - y&rsquo;)   (as gcd(r, s) = 1) &hellip;. (2)</p>
+<p>Similarly
+=&gt; s | (x&rsquo; - x0)    &hellip;. (3)</p>
+<p>From (3), we have</p>
+<p>=&gt; x&rsquo; - x0 = st
+=&gt; x&rsquo; = x0 + st (where b = ds, so s = b/d)
+=&gt; <strong>x&rsquo; = x0 + (b/d).t</strong> &hellip;. (4)</p>
+<p>And from (2) we get,
+<strong>y&rsquo; = y0 - (a/d).t</strong> &hellip;. (5)</p>
+<p>Hence from (4) and (5), we get the complete solution for the diophantine equation.</p>
+<h3 id="back-to-linear-congruence">BACK TO LINEAR CONGRUENCE<a hidden class="anchor" aria-hidden="true" href="#back-to-linear-congruence">#</a></h3>
+<p>Having studied the diophantine equation, we can start our analysis of equation (1) now, which was <strong>ax0 - ny0 = b</strong></p>
+<p>Through a direct comparison with the diophantine equation, we have the following condition for the existence of integer solution to this equation
+d | b, where d = gcd(a, n)
+Moreover the family of solution for x can be given as,
+<strong>x0, x0 + n/d, x0 + 2.n/d, &hellip;.., x0 + t.n/d</strong> &hellip;&hellip;.. (6)</p>
+<p>It is worth noting that we are now solving a congruence modulo n. Hence there will be finite number of unique solutions. We claim that there will be only d number of unique solutions. In other words, equation (6) should have a constraint 0 &lt;= t &lt; d, for all solutions to be unique.
+First we will prove uniqueness of any two solution in this range. Let, x0 + (n/d).t1 and x0 + (n/d).t2 be the two solution such that 0 &lt;= t1 &lt; t2 &lt;= d-1.
+We have to prove that these two solutions cannot be congruent modulo n.</p>
+<p>We will prove this by contradiction. Let us assume that the two solutions are congruent modulo n. Hence,
+=&gt; x0 + (n/d).t1 ≡ x0 + (n/d).t2 (mod n)
+=&gt; (n/d).t1 ≡ (n/d).t2 (mod n)
+=&gt; (n/d).(t1 - t2) = ny
+=&gt; (t1 - t2) = nd
+=&gt; <strong>t1 ≡ t2 (mod d)</strong> &hellip; (7)</p>
+<p>From (7), we have that d | (t1 - t2) or d | (t2 - t1)
+But since 0 &lt;= t1 &lt; t2 &lt;= d-1, hence <strong>0 &lt; t2 - t1 &lt; d</strong>. So there is no way in which d divides (t2 - t1). So d ∤ (t2 - t1), which is a contradiction. Hence all the d solutions are unique.
+Now it remains to be proved that ∀ t &gt;= d, the solutions are not unique.
+Let t = q.d + r where r = {0, 1, &hellip;.. d-1}
+So, x0 + (n/d).t = x0 + (n/d).(q.d + r)
+=&gt; x0 + nq + (nr/d)
+=&gt; x0 + (n/d).r (mod n)
+And as 0 &lt;= r &lt; d, hence this is one of the d unique solutions we already found.</p>
+<p>Hence the linear congruence ax ≡ b (mod n) has integer solutions only when d | b, where d = gcd(a, b) and it has exactly d unique solutions given as:</p>
+<p><strong>x0, x0 + (n/d), x0 + (2n/d), &hellip;., x0 + ((d-1).n/d)</strong></p>
+<h3 id="system-of-simultaneous-linear-congruence">SYSTEM OF SIMULTANEOUS LINEAR CONGRUENCE<a hidden class="anchor" aria-hidden="true" href="#system-of-simultaneous-linear-congruence">#</a></h3>
+<p>Having studied about a linear congruence in depth, lets move our focus to a system of such equations.</p>
+<p>a1x ≡ b1 (mod n1)
+a2x ≡ b2 (mod n2)
+a3x ≡ b3 (mod n3)
+.
+.
+arx ≡ br (mod nr)</p>
+<p>Now for the above system of congruences to have a soution, each of the linear congruences should have a solution individually.
+So if we consider dk = gcd(ak, nk) ∀ k∈{0, 1&hellip; r}, dk | bk. Moreover, we assume that gcd(ni, nj) = 1 i.e the n&rsquo;s are relatively prime to each other.
+Now lets go back to the question we asked during the beginning of the post. If we try to formulate that question in terms of congruences, we will have the following system of linear equations.</p>
+<p>x ≡ 1 (mod 5)
+x ≡ 2 (mod 7)
+x ≡ 3 (mod 9)
+x ≡ 4 (mod 11)</p>
+<p>We have to solve for x.</p>
+<h3 id="chinese-remainder-theorem">CHINESE REMAINDER THEOREM<a hidden class="anchor" aria-hidden="true" href="#chinese-remainder-theorem">#</a></h3>
+<p>CRT aims at solving the type of linear congruence systems as described by the above problem. CRT states that:
+For a system of linear congruences of the form
+x ≡ b1 (mod n1)
+x ≡ b2 (mod n2)
+x ≡ b3 (mod n3)
+.
+.
+x ≡ br (mod nr)
+where gcd(ni, nj) = 1, it will always have a unique solution modulo n = n1.n2.n3&hellip;nr.</p>
+<p>Lets try to prove the CRT and find that unique solution.</p>
+<p><strong>Proof</strong>: I will give more of an informal proof for the CRT as the formal one is pretty unintuitive. Let us begin by thinking of an integer which can satisfy all the above linear congruences. (We can be sure that each linear congruence will have a solution as ai = 1 for each equation and gcd(1, ni) = 1 and 1 | bi)
+Now the value x should be such that it produces the remainder bi&rsquo;s when divided by the corresponding ni&rsquo;s. Hence, it becomes clear that the solution must contain r terms most probably added together. Now when divided by a particular ni only one term should produce the remainder. Rest all the terms should evaluate to zero.
+Hence we introduce another variable
+Nk = n1.n2&hellip;.nk-1.nk+1&hellip;.nr
+So it is the product of all the numbers except nk.
+Moreover the term which remains should produce the remainder ak. So if we consider the solution to be of the form a1N1 + a2N2 + &hellip;. + arNr.
+We have the number remaining when take modulo nk as akNk (mod nk). However we wanted the modulo to be just ak. So we need to somehow get rid of the Nk.
+Well, we can define another linear congruence equation:
+Nk.x ≡ 1 (mod nk) &hellip;. (8)
+The above equation provides a method of finding the modular multiplicative inverse of an integer. (Nk in this case)
+Let us say that the above equation has a solution x = xk (Again we can check that it has just one unique solution using the argument proved before). Hence we have that Nk.xk ≡ 1 (mod nk) and so Nk.xk.ak ≡ ak (mod nk), which is what we wanted.
+So now we can construct the final solution as:
+x&rsquo; = a1N1x1 + a2N2x2 + &hellip;. + arNrxr
+It is easy to verify that the above solution satisfies all the linear congruences individually.
+As for the argument of this solution being unique, let us assume that there exists another solution x&rsquo;&rsquo; such that x&rsquo; ≢ x&rsquo;&rsquo; (mod n) (where n = n1.n2.n3&hellip;nr)
+Now as both x&rsquo; and x&rsquo;&rsquo; are solutions to the system, hence we can say that:
+x&rsquo; ≡ ak ≡ x&rsquo;&rsquo; (mod nk)
+=&gt; nk | x&rsquo; - x&rsquo;&rsquo;
+So we have n1 | x&rsquo; - x&rsquo;&rsquo;, n2 | x&rsquo; - x&rsquo;&rsquo;&hellip;. nr | x&rsquo; - x&rsquo;&rsquo;
+We can combine all these to give n | x&rsquo; - x&rsquo;&rsquo; (as gcd(ni, nj) = 1)
+=&gt; x&rsquo; - x&rsquo;&rsquo; ≡ 0 (mod n)
+=&gt; x&rsquo; ≡ x&rsquo;&rsquo; (mod n)
+Which is a contradiction and hence the two solutions are congruent. So there is just one unique solution of the CRT, which is
+x&rsquo; = a1N1x1 + a2N2x2 + &hellip;. + arNrxr</p>
+<p>Now lets finally go back to the problem posed at the start.
+x ≡ 1 (mod 5)
+x ≡ 2 (mod 7)
+x ≡ 3 (mod 9)
+x ≡ 4 (mod 11)</p>
+<p>We have to solve the above set of linear congruences. Using CRT, we have
+N1 = 7.9.11 = 693
+N2 = 5.9.11 = 495
+N3 = 5.7.11 = 385
+N4 = 5.7.9 = 315
+and a1 = 1, a2 = 2, a3 = 3 and a4 = 4
+Also we have to solve
+693.x1 ≡ 1 (mod 5)
+495.x2 ≡ 1 (mod 7)
+385.x3 ≡ 1 (mod 9)
+315.x4 ≡ 1 (mod 11)
+Using brute-force we can obtain x1 = 2, x2 = 3, x3 = 4, x4 = 8.
+Hence the final solution is:
+x&rsquo; = 1.693.2 + 2.495.3 + 3.385.4 + 4.315.8
+= 19056</p>
+<p>Taking the final solution modulo n (where n = 5.7.9.11 = 3465), we have</p>
+<p>19056 ≡ 1731 (mod 3465)
+Hence 1731 is the required unique solution which is the smallest too.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="http://localhost:1313/">My Musings</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>
