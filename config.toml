@@ -1,4 +1,4 @@
-baseURL = 'http://tanayjhablog.com/'
+baseURL = 'https://tanayjha-blog.vercel.app/blog'
 languageCode = 'en-us'
 title = 'My Musings'
 theme = "PaperMod"
