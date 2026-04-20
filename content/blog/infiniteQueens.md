@@ -10,20 +10,20 @@ There is a very interesting set of events that led me to this topic. And boy am 
 
 ## Backstory
 
-I am reading the book **Algorithms to Live By** (a great book so far btw). In that book, there is a mention of how to manage time like a CPU Scheduler and not do too many context switches as it can affect your productivity adversely. The author mentions [Donald Knuth](https://en.wikipedia.org/wiki/Donald_Knuth) who is a very famous computer scientist probably most famous for his book series - **The Art Of Computer Programming**. It was mentioned how he maintains his project [TEX](https://en.wikipedia.org/wiki/TeX) and since the software is relatively stable, he does a bug fix for it every 6 years and no sooner. The author mentions how he is an embodiment of minimal context switching lifestyle and focussing on just one thing at once. This is another topic of debate but not of interest in this blog post. I already knew about Knuth but just out of curiosity I searched around a bit and found [these](https://www.youtube.com/playlist?list=PLoROMvodv4rOAvKVR_dyCigSBMcYjevYB): **Donald Knuth Christmas Lectures at Stanford**. I started watching the 2017 lecture, [A Conjecture That Had To Be True](https://www.youtube.com/watch?v=BxQw4CdxLr8&list=PLoROMvodv4rOAvKVR_dyCigSBMcYjevYB&index=3) and even though the primary focus of the lecture was on a different problem (which was also pretty interesting), what caught my eye was something he mentioned at around the end of the lecture. The infinite queens problem. As much as I would like to continue this story, I think it would be better to just get into the technical details and see what this is all about.
+I am reading the book **Algorithms to Live By** (a great book so far, btw). In that book, there is a mention of how to manage time like a CPU scheduler and not do too many context switches, as it can affect your productivity adversely. The author mentions [Donald Knuth](https://en.wikipedia.org/wiki/Donald_Knuth), a very famous computer scientist, probably most famous for his book series **The Art of Computer Programming**. It was mentioned how he maintains his project [TeX](https://en.wikipedia.org/wiki/TeX), and since the software is relatively stable, he does a bug fix for it every 6 years and no sooner. The author mentions how he is an embodiment of the minimal-context-switching lifestyle and focussing on just one thing at once. This is another topic of debate but not of interest in this blog post. I already knew about Knuth, but just out of curiosity I searched around a bit and found [these](https://www.youtube.com/playlist?list=PLoROMvodv4rOAvKVR_dyCigSBMcYjevYB): **Donald Knuth's Christmas Lectures at Stanford**. I started watching the 2017 lecture, [A Conjecture That Had To Be True](https://www.youtube.com/watch?v=BxQw4CdxLr8&list=PLoROMvodv4rOAvKVR_dyCigSBMcYjevYB&index=3), and even though the primary focus of the lecture was on a different problem (which was also pretty interesting), what caught my eye was something he mentioned around the end of the lecture: the infinite queens problem. As much as I would like to continue this story, I think it would be better to just get into the technical details and see what this is all about.
 
 ## Infinite Queens Problem
 
-The infinite queens problem (or this version of it) has to do with the placements of queens on it. Assume you place a queen at the first square. Now for each successive row, as you go up the board, find the lexicographically smallest (basically leftmost) position where you can place a queen such that no other existing queens threaten that queen. And this procedure is repeated for all the rows. We are interested in plotting the positions of all these queens and want to see if any interesting pattern emerges out of them.
+The infinite queens problem (or this version of it) has to do with the placement of queens on a board. Assume you place a queen at the first square. Now, for each successive row as you go up the board, find the lexicographically smallest (basically leftmost) position where you can place a queen such that no other existing queens threaten it. This procedure is repeated for all the rows. We are interested in plotting the positions of all these queens and want to see if any interesting pattern emerges out of them.
 
 ## Solution Attempt 1
 
-Now many of you might have heard about the [n-queens problem](https://en.wikipedia.org/wiki/Eight_queens_puzzle) which deals with a fixed number of queen and is easily solved using backtracking. This one is similar but also different mainly due to the constraints. The value of N here will be large. To see some interesting patterns, I thought maybe a value of 10^5 would be good. Also we don't want just any orientation of the queens. We want the lexicographically smallest one (which I believe kind of simplifies things for us).
+Many of you might have heard about the [N-Queens problem](https://en.wikipedia.org/wiki/Eight_queens_puzzle), which deals with a fixed number of queens and is easily solved using backtracking. This one is similar but also different, mainly due to the constraints. The value of $N$ here will be large. To see some interesting patterns, I thought maybe a value of $10^5$ would be good. Also, we don't want just any orientation of the queens. We want the lexicographically smallest one (which I believe kind of simplifies things for us).
 
-So the problem seemed pretty straightforward and I quickly came up with the following code for it using backtracking:
+So the problem seemed pretty straightforward, and I quickly came up with the following code for it using backtracking:
 
-```
-#include <bits\stdc++.h>
+```cpp
+#include <bits/stdc++.h>
 using namespace std;
 const int BOARD_SIZE = 4000;
 long long hitCounter = 0;
@@ -81,7 +81,7 @@ int main() {
 }
 ```
 
-So the time complexity, as I print towards the end, is the product of three factors. The size of the board. The number of positions I have to traverse to find a slot for the queen. And the complexity of checking if the queen can be placed in a slot without being threatened by the other queens. Now the first number is a constant but the second and third will change depending upon which queen I am trying to place. Sometimes you may get a position quickly but other times it may take long. So I print out the average values for both of them to get a sense of which one is a bottleneck in case I need to make things faster. Here is the output of the above program for different board_sizes:
+So the time complexity, as I print towards the end, is the product of three factors: the size of the board, the number of positions I have to traverse to find a slot for the queen, and the complexity of checking if the queen can be placed in a slot without being threatened by the other queens. The first number is a constant, but the second and third will change depending upon which queen I am trying to place. Sometimes you may get a position quickly, but other times it may take long. So I print out the average values for both of them to get a sense of which one is a bottleneck in case I need to make things faster. Here is the output of the above program for different board sizes:
 
 ```
 BOARD_SIZE: 100
@@ -109,21 +109,21 @@ Time Complexity = BOARD_SIZE * slot check * hit check: 131798070000
 Time elapsed: 1864.65 s.
 ```
 
-I was initially surprised to see that this was able to handle a board size upto 5000 in about 2 mins on my machine. I was under the impression that 10^7 operations is what you can do in a sec. But turns out it is 10^8 since the operations we are doing are pretty simple (something like a mod operator is costly but simple addition subtraction work much faster). So it immediately saved a factor of 10. The runtime for 10^4 is about 30 mins which I believe starts getting a little less practical. So looks like that is kind of the limit for this. Then I decided to try and optimize this a bit since my goal was to go upto 10^5 points at least...
+I was initially surprised to see that this was able to handle a board size up to 5000 in about 2 mins on my machine. I was under the impression that $10^7$ operations is what you can do in a second. But it turns out it is $10^8$, since the operations we are doing are pretty simple (something like a mod operator is costly, but simple addition and subtraction work much faster). So it immediately saved a factor of 10. The runtime for $10^4$ is about 30 mins, which I believe starts getting a little less practical. So it looks like that is kind of the limit for this. Then I decided to try and optimize this a bit, since my goal was to go up to $10^5$ points at least...
 
-## Solution Atempt 2
+## Solution Attempt 2
 
-I knew that one thing I could optimize was the isValidArrangement() method to check if the queen could be safely placed in a square. 
-To do that we will have to store some extra info every time we get a new queen placement. I think of it as projecting a laser from that queen and then finding the source of that laser on the horizontal axis. So there are four directions in which a queen looks whenever placed on a board. Three of them hit the x-axis and it is pretty easy to find the co-ordinates of the points where it intercepts the x-axis. These are the three points I stored for each of the queen placement and thought of them as lasers emerging from the x-axis along with their direction. 
+I knew that one thing I could optimize was the `isValidArrangement()` method to check if the queen could be safely placed in a square.
+To do that, we will have to store some extra info every time we get a new queen placement. I think of it as projecting a laser from that queen and then finding the source of that laser on the horizontal axis. There are four directions in which a queen looks whenever placed on a board. Three of them hit the x-axis, and it is pretty easy to find the coordinates of the points where it intercepts the x-axis. These are the three points I stored for each queen placement, and I thought of them as lasers emerging from the x-axis along with their direction.
 
 {{< figure src="/images/infiniteQueens/lasers.png"  >}}
 
-Now with this info handy, whenever I am trying to put a new queen on the board and I want to check if it will threaten any existing queen, I repeat the same process and find the three intercepts for this queen with the x-axis. If any of these matches an existing laser, well that means there already exists a queen which will be in the line of sight of this one, so the arrangement is not safe. This reduces the check time for each square from ~n to constant time. 
+Now with this info handy, whenever I am trying to put a new queen on the board and I want to check if it will threaten any existing queen, I repeat the same process and find the three intercepts for this queen with the x-axis. If any of these matches an existing laser, that means there already exists a queen which will be in the line of sight of this one, so the arrangement is not safe. This reduces the check time for each square from $O(n)$ to constant time.
 
 Here is the code for this new approach:
 
-```
-#include <bits\stdc++.h>
+```cpp
+#include <bits/stdc++.h>
 using namespace std;
 set<pair<int, int>> lasers;
 const int BOARD_SIZE = 10000;
@@ -209,14 +209,14 @@ Time Complexity = BOARD_SIZE * slot check * hit check (O(1)): 556200000
 Time elapsed: 834.669 s.
 ```
 
-It is immediately evident how better this is over the original (kind of brute-force) approach. We get 10^4 points in under 2 mins. However this still doesn't scale very well over 50k points.
-I also wanted to figure out a way to improve the effeciency of slot check. Basically there can be some optimizations done by ignoring the initial slots which we know will not work. It reduces to the problem of finding the minimum missing positive integer in a list which is getting appended. I could not find a good solution for this. But for our purpose of plotting the pattern of the queen positions, 30k points would do. 
+It is immediately evident how much better this is over the original (kind of brute-force) approach. We get $10^4$ points in under 2 mins. However, this still doesn't scale very well over 50k points.
+I also wanted to figure out a way to improve the efficiency of the slot check. Basically, some optimizations can be done by ignoring the initial slots which we know will not work. It reduces to the problem of finding the minimum missing positive integer in a list which is getting appended to. I could not find a good solution for this. But for our purpose of plotting the pattern of the queen positions, 30k points would do.
 
 ## The Grand Finale
 
-Now the reason why I started this whole effort was mentioned by Donald Knuth in the video. He had suggested that the arrangements of the queen which satisfy the problem constraint is very interesting. So I decided to plot them out. I had already collected 10^5 positions of the queens. I decided to use my good friend, the matplotlib library, in python to just plot them out and see what I get. Here is a graph of all these points scattered over the x-y plane. Here is a code for the same:
+Now, the reason I started this whole effort was mentioned by Donald Knuth in the video. He had suggested that the arrangements of the queens which satisfy the problem constraint are very interesting. So I decided to plot them out. I had already collected $10^5$ positions of the queens. I decided to use my good friend, the matplotlib library in Python, to just plot them out and see what I get. Here is a graph of all these points scattered over the x-y plane. Here is the code for the same:
 
-```
+```python
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -250,10 +250,10 @@ This is the output:
 
 {{< figure src="/images/infiniteQueens/graph.png"  >}}
 
-This graph in itself is extremely surprising. It looks like the queen positions all lie on just two straight lines. Obviously they will not be exact straight lines since the queens will just attack each other then. But they are very close along these lines. These two lines can be differentiated by the property of having x < y and x > y. 
+This graph in itself is extremely surprising. It looks like the queen positions all lie on just two straight lines. Obviously, they will not be exact straight lines, since the queens would just attack each other then. But they lie very close to these lines. These two lines can be differentiated by the property of having $x < y$ and $x > y$.
 
-If you have read so far, I have saved the best for the last. As if these points being distributed in this way was not good enough, the slopes of these lines is what tops all of this.
-To calculate the slope, I used the numpy library and the [polyfit function](https://numpy.org/doc/stable/reference/generated/numpy.polyfit.html) it provides. This function is basically used in linear regression. It finds a line which minimises the squared distance of each point from this line. Here is the slope of this line for different number of points plotted:
+If you have read so far, I have saved the best for last. As if these points being distributed in this way was not good enough, the slopes of these lines top all of this.
+To calculate the slope, I used the numpy library and the [polyfit function](https://numpy.org/doc/stable/reference/generated/numpy.polyfit.html) it provides. This function is basically used in linear regression. It finds a line which minimises the squared distance of each point from this line. Here are the slopes of these lines for different numbers of points plotted:
 
 ```
 No. of Points: 1000
@@ -269,17 +269,17 @@ Line 1 Slope:  1.618033966178691
 Line 2 Slope:  0.6180339608635457
 ```
 
-Are you shocked yet? Read the slope of line 1 carefully. Does it ring a bell? 
+Are you shocked yet? Read the slope of line 1 carefully. Does it ring a bell?
 How about now?
 
 {{< figure src="/images/infiniteQueens/goldenRatio.png"  >}}
 
-Yes, the slope of line 1 is the **golden ratio**!! The slope of line 2 is **1 / golden ratio**. And you can also see how plotting more points allows the polyfit method to work better and the slope gets closer to the golden ratio matching more decimal places. 
+Yes, the slope of line 1 is the **golden ratio**!! The slope of line 2 is **1 / golden ratio**. And you can also see how plotting more points allows the polyfit method to work better, and the slope gets closer to the golden ratio, matching more decimal places.
 
-This result is eery to be honest. What is the golden ratio doing here? Well I don't know. I am probably content in not knowing. I already got my share of joy by just seeing this result in action after putting in some hardwork.
+This result is eerie, to be honest. What is the golden ratio doing here? Well, I don't know. I am probably content in not knowing. I already got my share of joy by just seeing this result in action after putting in some hard work.
 
-Remember the title of Donald Knuths lecture, The Conjecture Which Had To Be True. He ended the lecture saying this is another conjecture which he feels has to be true (the conjecture being that the queen positions for the above stated infinite queens problem, lie along two lines with the slopes being golden ratio and its inverse) but he is also pretty sure that there will be no proof of this anytime soon. If it does get proved in my lifetime anyway, I will be on the lookout!
+Remember the title of Donald Knuth's lecture, *A Conjecture That Had To Be True*. He ended the lecture saying this is another conjecture which he feels has to be true (the conjecture being that the queen positions for the above-stated infinite queens problem lie along two lines with the slopes being the golden ratio and its inverse), but he is also pretty sure that there will be no proof of this anytime soon. If it does get proved in my lifetime, I will be on the lookout!
 
 ### Sidenote
 
-On his website, Knuth has posted [his solution](https://www-cs-faculty.stanford.edu/~knuth/programs/infty-queens.w) for this as well. He was able to bring in 10^9 points! But he kind of reverse engineered it and started with the assumption that the points will lie close to the line with the golden ratio slopes. Even then, his version of the program is too complicated for me to understand easily and I did not spend too much time on it. However I am sure it is filled with a lot of clever bit hacks which makes it so effecient. Do check it out if you are interested. 
+On his website, Knuth has posted [his solution](https://www-cs-faculty.stanford.edu/~knuth/programs/infty-queens.w) for this as well. He was able to bring in $10^9$ points! But he kind of reverse-engineered it and started with the assumption that the points will lie close to the lines with the golden ratio slopes. Even then, his version of the program is too complicated for me to understand easily, and I did not spend too much time on it. However, I am sure it is filled with a lot of clever bit hacks which make it so efficient. Do check it out if you are interested. 
