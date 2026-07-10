@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="520" viewBox="0 0 640 520" role="img" aria-labelledby="title desc">
+  <title id="title">A coloring of K5 with no monochromatic triangle</title>
+  <desc id="desc">The outer pentagon edges are blue and the five diagonals are red. Both colors form a five-cycle, so neither color contains a triangle.</desc>
+  <defs>
+    <style>
+      .label { font: 18px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #222; }
+      .small { font: 15px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #444; }
+      .vertex { fill: #fff; stroke: #222; stroke-width: 3; }
+      .blue { stroke: #2368d9; stroke-width: 5; stroke-linecap: round; }
+      .red { stroke: #d33f49; stroke-width: 5; stroke-linecap: round; }
+    </style>
+  </defs>
+
+  <rect width="640" height="520" fill="#fff"/>
+  <text x="320" y="38" class="label" text-anchor="middle">K5 counterexample</text>
+  <text x="320" y="64" class="small" text-anchor="middle">Blue outer cycle + red diagonal cycle: no monochromatic triangle</text>
+
+  <g>
+    <line x1="320" y1="95" x2="410" y2="378" class="red"/>
+    <line x1="488" y1="218" x2="152" y2="218" class="red"/>
+    <line x1="410" y1="378" x2="198" y2="378" class="red"/>
+    <line x1="198" y1="378" x2="488" y2="218" class="red"/>
+    <line x1="152" y1="218" x2="320" y2="95" class="red"/>
+
+    <line x1="320" y1="95" x2="488" y2="218" class="blue"/>
+    <line x1="488" y1="218" x2="410" y2="378" class="blue"/>
+    <line x1="410" y1="378" x2="198" y2="378" class="blue"/>
+    <line x1="198" y1="378" x2="152" y2="218" class="blue"/>
+    <line x1="152" y1="218" x2="320" y2="95" class="blue"/>
+
+    <circle cx="320" cy="95" r="18" class="vertex"/>
+    <circle cx="488" cy="218" r="18" class="vertex"/>
+    <circle cx="410" cy="378" r="18" class="vertex"/>
+    <circle cx="198" cy="378" r="18" class="vertex"/>
+    <circle cx="152" cy="218" r="18" class="vertex"/>
+  </g>
+
+  <g transform="translate(195, 455)">
+    <line x1="0" y1="0" x2="42" y2="0" class="blue"/>
+    <text x="54" y="5" class="small">pentagon edges</text>
+    <line x1="210" y1="0" x2="252" y2="0" class="red"/>
+    <text x="264" y="5" class="small">diagonals</text>
+  </g>
+</svg>
