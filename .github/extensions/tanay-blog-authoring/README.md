@@ -2,6 +2,8 @@
 
 This project extension exposes `tanay_blog_authoring_skill` inside GitHub Copilot CLI.
 
+`extension.mjs` is intentionally only a thin Copilot CLI wrapper. The actual skill instructions live in `SKILL.md`.
+
 Use it when creating a blog post from notes, PDFs, handwritten material, or a topic description and publishing the result to this Hugo/Vercel blog repo.
 
 The skill captures the end-to-end workflow:
