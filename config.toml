@@ -15,3 +15,8 @@ imageHeight = 120
 [[params.profileMode.buttons]]
   name = "Blog"
   url = "/blog"
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
