@@ -1,6 +1,12 @@
 ---
 title: "Ramsey Numbers"
 date: 2026-07-11T00:24:46+05:30
+summary: "An exploration of Ramsey numbers, the probabilistic method, and how Erdos used it to prove surprising lower bounds."
+tags: ["math", "probability", "graphs", "proofs"]
+categories: ["Math"]
+cover:
+  image: "images/ramseyNumbers/simpleGraph.png"
+  alt: "Simple graph for Ramsey numbers"
 draft: false
 showToc: true
 ShowReadingTime: true

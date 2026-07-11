@@ -1,6 +1,9 @@
 ---
 title: "Maximum Flow"
 date: 2017-04-19T12:09:25+05:30
+summary: "An introduction to the maximum-flow problem, its motivation, and the core network-flow model."
+tags: ["algorithms", "graphs", "network-flow"]
+categories: ["Algorithms"]
 draft: false
 showToc: true
 ShowReadingTime: true

@@ -1,6 +1,9 @@
 ---
 title: "Chinese Remainder Theorem"
 date: 2017-04-26T12:09:25+05:30
+summary: "A simple introduction to the Chinese Remainder Theorem and how it solves modular arithmetic puzzles."
+tags: ["number-theory", "math", "algorithms"]
+categories: ["Math"]
 draft: false
 showToc: true
 ShowReadingTime: true

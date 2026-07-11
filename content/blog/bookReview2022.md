@@ -1,6 +1,9 @@
 ---
 title: "Year in books - 2022"
 date: 2022-12-30T00:24:13+05:30
+summary: "A year-end reflection on rebuilding a reading habit and the books that stood out in 2022."
+tags: ["books", "reading", "reflection"]
+categories: ["Books"]
 draft: false
 showToc: true
 ShowReadingTime: true

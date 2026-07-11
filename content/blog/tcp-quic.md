@@ -1,6 +1,12 @@
 ---
 title: "Exploring TCP and QUIC"
 date: 2024-05-26T00:24:13+05:30
+summary: "A walkthrough of TCP and QUIC, their protocol tradeoffs, and why QUIC changes modern network communication."
+tags: ["networking", "tcp", "quic", "protocols"]
+categories: ["Networking"]
+cover:
+  image: "images/tcp/h3protocol.png"
+  alt: "HTTP/3 protocol stack"
 draft: false
 showToc: true
 ShowReadingTime: true

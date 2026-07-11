@@ -1,6 +1,12 @@
 ---
 title: "Birthday Paradox"
 date: 2024-07-28T00:24:13+05:30
+summary: "A quick probability walkthrough of why shared birthdays appear much sooner than intuition suggests."
+tags: ["probability", "math", "simulation"]
+categories: ["Math"]
+cover:
+  image: "images/birthdayParadox/peopleVsProb.png"
+  alt: "Birthday paradox probability curve"
 draft: false
 showToc: true
 ShowReadingTime: true

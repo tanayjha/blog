@@ -1,0 +1,9 @@
+{{- $images := slice -}}
+{{- with .Params.images -}}
+  {{- range . -}}
+    {{- with resources.Get . -}}
+      {{- $images = $images | append . -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- return $images -}}

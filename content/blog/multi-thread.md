@@ -1,6 +1,9 @@
 ---
 title: "Some Mysteries of Multi-Threading"
 date: 2021-04-02T12:09:25+05:30
+summary: "Notes on Java concurrency, thread safety, and the pitfalls that make multithreaded code subtle."
+tags: ["concurrency", "java", "systems"]
+categories: ["Software Engineering"]
 draft: false
 showToc: true
 ShowReadingTime: true

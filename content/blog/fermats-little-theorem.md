@@ -1,6 +1,9 @@
 ---
 title: "Fermat's Little Theorem"
 date: 2017-06-08T12:09:25+05:30
+summary: "A plain-language proof of Fermat's little theorem and its role in modular arithmetic."
+tags: ["number-theory", "math", "proofs"]
+categories: ["Math"]
 draft: false
 showToc: true
 ShowReadingTime: true

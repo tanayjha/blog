@@ -1,6 +1,12 @@
 ---
 title: "RSA Encryption System"
 date: 2017-04-22T12:09:25+05:30
+summary: "A step-by-step explanation of RSA encryption and the number theory that makes public-key cryptography work."
+tags: ["cryptography", "security", "number-theory"]
+categories: ["Security"]
+cover:
+  image: "images/rsa.png"
+  alt: "RSA encryption flow"
 draft: false
 showToc: true
 ShowReadingTime: true
