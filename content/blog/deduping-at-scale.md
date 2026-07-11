@@ -1,6 +1,12 @@
 ---
 title: "Deduping at Scale"
 date: 2020-11-29T12:09:25+05:30
+summary: "A production story from Sumo Logic about deduplicating cloud collection data at scale."
+tags: ["distributed-systems", "data-ingestion", "deduplication"]
+categories: ["Distributed Systems"]
+cover:
+  image: "images/dedupe1.png"
+  alt: "Deduplication flow"
 draft: false
 showToc: true
 ShowReadingTime: true
@@ -130,6 +136,5 @@ This was the connections graph in one of the production deployments after the ro
 ### Conclusion
 
 Overall, this was a nice, challenging project to work on and gave me a chance to work closely with some SQL/NoSQL DBs. Database migration is a challenging task, but if done right, it can really improve your scalability and save you the time and complexity of revamping your complete microservice!
-
 
 

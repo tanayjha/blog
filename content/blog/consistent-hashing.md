@@ -1,6 +1,12 @@
 ---
 title: "Consistent Hashing"
 date: 2022-06-22T12:09:25+05:30
+summary: "A practical explanation of consistent hashing and why it is elegant for distributed systems."
+tags: ["distributed-systems", "hashing", "system-design"]
+categories: ["Distributed Systems"]
+cover:
+  image: "images/hashing.png"
+  alt: "Consistent hashing ring"
 draft: false
 showToc: true
 ShowReadingTime: true

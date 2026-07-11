@@ -1,6 +1,12 @@
 ---
 title: "Evaluating million digits of Pi"
 date: 2022-08-16T00:24:13+05:30
+summary: "A hands-on exploration of computing a million digits of pi and the algorithms that make it possible."
+tags: ["math", "algorithms", "pi"]
+categories: ["Math"]
+cover:
+  image: "images/photos/machin_pi.png"
+  alt: "Pi computation formula"
 draft: false
 showToc: true
 ShowReadingTime: true

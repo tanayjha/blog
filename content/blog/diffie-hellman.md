@@ -1,6 +1,12 @@
 ---
 title: "Diffie Hellman Key Exchange"
 date: 2023-02-03T00:24:13+05:30
+summary: "An intuitive explanation of Diffie-Hellman key exchange and the number theory behind secure shared secrets."
+tags: ["cryptography", "security", "number-theory"]
+categories: ["Security"]
+cover:
+  image: "images/diffieHellman/diffieHellman.png"
+  alt: "Diffie-Hellman exchange"
 draft: false
 showToc: true
 ShowReadingTime: true

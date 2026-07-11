@@ -1,6 +1,12 @@
 ---
 title: "Book Review: Atomic Habits"
 date: 2022-01-28T12:09:25+05:30
+summary: "Notes and personal takeaways from Atomic Habits, focused on applying systems for better daily behavior."
+tags: ["books", "habits", "productivity"]
+categories: ["Books"]
+cover:
+  image: "images/habit.png"
+  alt: "Atomic Habits notes"
 draft: false
 showToc: true
 ShowReadingTime: true

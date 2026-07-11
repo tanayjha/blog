@@ -1,6 +1,12 @@
 ---
 title: "Infinite Queens"
 date: 2022-11-30T00:24:13+05:30
+summary: "A journey from Donald Knuth's lecture to the infinite queens problem and its surprising mathematical structure."
+tags: ["math", "algorithms", "puzzles"]
+categories: ["Math"]
+cover:
+  image: "images/infiniteQueens/graph.png"
+  alt: "Infinite queens graph"
 draft: false
 showToc: true
 ShowReadingTime: true

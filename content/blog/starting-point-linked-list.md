@@ -1,6 +1,12 @@
 ---
 title: "Detecting starting point of loop in a linked list"
 date: 2019-06-06T12:01:25+05:30
+summary: "An explanation of Floyd's cycle detection and why it finds the start of a linked-list loop."
+tags: ["algorithms", "linked-list", "proofs"]
+categories: ["Algorithms"]
+cover:
+  image: "images/linkedList.png"
+  alt: "Linked list cycle"
 draft: false
 showToc: true
 ShowReadingTime: true

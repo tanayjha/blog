@@ -1,6 +1,9 @@
 ---
 title: "Max Flow Min Cut"
 date: 2017-04-21T12:09:25+05:30
+summary: "A continuation of maximum flow that introduces cuts and the max-flow min-cut relationship."
+tags: ["algorithms", "graphs", "network-flow"]
+categories: ["Algorithms"]
 draft: false
 showToc: true
 ShowReadingTime: true

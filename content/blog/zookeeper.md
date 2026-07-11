@@ -1,6 +1,12 @@
 ---
 title: "ZooKeeper Internals"
 date: 2021-07-21T12:09:25+05:30
+summary: "A deep dive into ZooKeeper internals, quorum reads and writes, leader election, and replication."
+tags: ["distributed-systems", "zookeeper", "consensus"]
+categories: ["Distributed Systems"]
+cover:
+  image: "images/zk2.png"
+  alt: "ZooKeeper architecture"
 draft: false
 showToc: true
 ShowReadingTime: true

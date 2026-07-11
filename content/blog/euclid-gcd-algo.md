@@ -1,6 +1,12 @@
 ---
 title: "Euclid's GCD Algorithm"
 date: 2021-03-08T12:09:25+05:30
+summary: "A proof-oriented explanation of Euclid's algorithm and why the classic GCD method works."
+tags: ["algorithms", "math", "number-theory"]
+categories: ["Algorithms"]
+cover:
+  image: "images/gcd.png"
+  alt: "Euclid GCD example"
 draft: false
 showToc: true
 ShowReadingTime: true
