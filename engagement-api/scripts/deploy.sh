@@ -33,7 +33,7 @@ az functionapp create \
   --storage-account "${storage_account}" \
   --consumption-plan-location "${location}" \
   --runtime node \
-  --runtime-version 20 \
+  --runtime-version 22 \
   --functions-version 4 \
   --os-type Linux \
   --output none
