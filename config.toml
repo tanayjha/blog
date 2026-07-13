@@ -36,8 +36,8 @@ ShowFullTextinRSS = false
 comments = true
 
 [params.engagement]
-enabled = false
-apiBaseUrl = "http://localhost:7071/api"
+enabled = true
+apiBaseUrl = "https://tanayjha-blog-engagement-ccdb45.azurewebsites.net/api"
 enableLikes = true
 enableComments = true
 enableViews = true
