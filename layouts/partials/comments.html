@@ -1,0 +1,47 @@
+{{- $engagement := site.Params.engagement -}}
+{{- $mainSections := site.Params.mainSections | default (slice "posts") -}}
+{{- $isBlogPost := and (eq .Kind "page") (in $mainSections .Section) -}}
+{{- if and $engagement.enabled $engagement.apiBaseUrl $isBlogPost -}}
+{{- $slug := .File.ContentBaseName | default (.Title | urlize) -}}
+{{- $js := resources.Get "js/engagement.js" | js.Build | resources.Minify -}}
+{{- if not site.Params.assets.disableFingerprinting -}}
+{{- $js = $js | fingerprint -}}
+{{- end -}}
+<section
+  class="engagement"
+  data-engagement-widget
+  data-api-base="{{ strings.TrimRight "/" $engagement.apiBaseUrl }}"
+  data-slug="{{ $slug }}"
+  data-enable-likes="{{ ne $engagement.enableLikes false }}"
+  data-enable-comments="{{ ne $engagement.enableComments false }}"
+  data-enable-views="{{ ne $engagement.enableViews false }}"
+  hidden>
+  <div class="engagement__summary">
+    <button class="engagement__like" type="button" data-engagement-like>
+      <span aria-hidden="true">Like</span>
+      <span data-engagement-likes>0</span>
+    </button>
+    <span class="engagement__stat" data-engagement-views-wrap>
+      <span data-engagement-views>0</span> reads
+    </span>
+  </div>
+
+  <div class="engagement__comments" data-engagement-comments-wrap>
+    <h2>Comments</h2>
+    <div class="engagement__comment-list" data-engagement-comments></div>
+    <form class="engagement__form" data-engagement-form>
+      <label>
+        Name
+        <input name="username" type="text" maxlength="40" autocomplete="name" required>
+      </label>
+      <label>
+        Comment
+        <textarea name="text" maxlength="2000" rows="4" required></textarea>
+      </label>
+      <button type="submit">Post comment</button>
+      <p class="engagement__message" data-engagement-message aria-live="polite"></p>
+    </form>
+  </div>
+</section>
+<script defer src="{{ $js.RelPermalink }}"{{ if $js.Data.Integrity }} integrity="{{ $js.Data.Integrity }}" crossorigin="anonymous"{{ end }}></script>
+{{- end -}}
