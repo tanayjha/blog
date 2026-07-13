@@ -33,6 +33,14 @@ ShowRssButtonInSectionTermList = true
 ShowPageNums = true
 ShowWordCount = false
 ShowFullTextinRSS = false
+comments = true
+
+[params.engagement]
+enabled = false
+apiBaseUrl = "http://localhost:7071/api"
+enableLikes = true
+enableComments = true
+enableViews = true
 
 [params.cover]
 linkFullImages = true
