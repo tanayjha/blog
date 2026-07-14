@@ -46,6 +46,14 @@ az functionapp config appsettings set \
     "ENGAGEMENT_STORAGE_CONNECTION_STRING=${connection_string}" \
   --output none
 
+for origin in "${allowed_origin}" "http://localhost:1313" "http://127.0.0.1:1313"; do
+  az functionapp cors add \
+    --name "${function_app}" \
+    --resource-group "${resource_group}" \
+    --allowed-origins "${origin}" \
+    --output none
+done
+
 npm install
 func azure functionapp publish "${function_app}" --javascript
 
