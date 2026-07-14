@@ -23,19 +23,27 @@
     return `${apiBase}/posts/${encodeURIComponent(slug)}/${action}`;
   };
 
-  const request = async function (url, options) {
+  const request = async function (url, options = {}) {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 2500);
+    const headers = { ...(options.headers || {}) };
+
+    if (options.body && !headers["Content-Type"]) {
+      headers["Content-Type"] = "application/json";
+    }
+
+    const fetchOptions = {
+      ...options,
+      signal: controller.signal,
+    };
+    delete fetchOptions.headers;
+
+    if (Object.keys(headers).length) {
+      fetchOptions.headers = headers;
+    }
 
     try {
-      const response = await fetch(url, {
-        ...options,
-        headers: {
-          "Content-Type": "application/json",
-          ...(options && options.headers ? options.headers : {}),
-        },
-        signal: controller.signal,
-      });
+      const response = await fetch(url, fetchOptions);
 
       if (!response.ok) throw new Error(`Engagement API returned ${response.status}`);
       return response.status === 204 ? null : response.json();
